@@ -2,11 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:componentes_visuais/componentes/butoes.dart';
-import 'package:componentes_visuais/componentes/campo_texto.dart';
-import 'package:componentes_visuais/componentes/icone_item.dart';
 import 'package:componentes_visuais/componentes/layout_confirmacao_accao.dart';
-import 'package:componentes_visuais/componentes/modelo_item_lista.dart';
 import 'package:componentes_visuais/dialogo/dialogos.dart';
 import 'package:componentes_visuais/dialogo/toast.dart';
 import 'package:file_picker/file_picker.dart';
@@ -30,7 +26,6 @@ import 'package:yetu_gestor/dominio/entidades/preco.dart';
 import 'package:yetu_gestor/dominio/entidades/produto.dart';
 import 'package:yetu_gestor/dominio/entidades/saida.dart';
 import 'package:yetu_gestor/dominio/entidades/stock.dart';
-import 'package:yetu_gestor/dominio/entidades/venda.dart';
 import 'package:yetu_gestor/fonte_dados/erros.dart';
 import 'package:yetu_gestor/fonte_dados/provedores/provedor_entrada.dart';
 import 'package:yetu_gestor/fonte_dados/provedores/provedor_funcionario.dart';
@@ -116,7 +111,8 @@ class ProdutosC extends GetxController {
     lista.addAll(res);
     listaCopia.clear();
     listaCopia.addAll(lista);
-    lista.forEach((element) {
+    lista.forEach((element) async {
+      element.stock = await pegarStock(element);
       element.estado ??= Estado.ATIVADO;
     });
     return lista;
@@ -127,6 +123,7 @@ class ProdutosC extends GetxController {
     lista.clear();
     for (var cada in res) {
       if (cada.estado == Estado.ATIVADO) {
+        cada.stock = await pegarStock(cada);
         lista.add(cada);
       }
     }
@@ -138,6 +135,7 @@ class ProdutosC extends GetxController {
     var res = await _manipularProdutoI.pegarLista();
     for (var cada in res) {
       if (cada.estado == Estado.DESACTIVADO) {
+        cada.stock = await pegarStock(cada);
         lista.add(cada);
       }
     }
@@ -149,6 +147,7 @@ class ProdutosC extends GetxController {
     var res = await _manipularProdutoI.pegarLista();
     for (var cada in res) {
       if (cada.estado == Estado.ELIMINADO) {
+        cada.stock = await pegarStock(cada);
         lista.add(cada);
       }
     }
@@ -188,6 +187,7 @@ class ProdutosC extends GetxController {
   void mostrarDialogoGerarRelatorioInvestimento(BuildContext context) async {
     List<List<String>> listaItens = [];
     var hoje = DateTime.now();
+    mostrarCarregandoDialogoDeInformacao("Carregando...");
     var todos = await _manipularProdutoI.pegarLista();
     for (var cada in todos) {
       var precos = await _manipularPrecoI.pegarPrecoProdutoDeId(cada.id ?? -1);
@@ -245,8 +245,9 @@ class ProdutosC extends GetxController {
   void mostrarDialogoReceberCompleto(Produto produto) {
     mostrarDialogoDeLayou(LayoutReceberCompleto(
         comOpcaoRetirada: false,
+        produto: produto,
         accaoAoFinalizar: (int quantidadePorLotes, int quantidadeLotes,
-            precoLote, double custo, bool pagavel) async {
+            precoLote, double custo, bool pagavel, bool modoCompleto) async {
           var motivo = Entrada.MOTIVO_ABASTECIMENTO;
           voltar();
           await _receberProduto(produto, quantidadePorLotes, quantidadeLotes,
@@ -272,6 +273,7 @@ class ProdutosC extends GetxController {
     AplicacaoC aplicacaoC = Get.find();
     var funcionario = await _manipularFuncionarioI
         .pegarFuncionarioDoUsuarioDeId((aplicacaoC.pegarUsuarioActual())!.id!);
+    mostrar(precoLote);
     await _manipularRececcaoI.receberProduto(produto, quantidadePorLotes,
         quantidadeLotes, precoLote, custo, funcionario, motivo, pagavel);
   }
@@ -281,7 +283,7 @@ class ProdutosC extends GetxController {
         comOpcaoRetirada: false,
         accaoAoFinalizar: (quantidade, o) async {
           var motivo = Entrada.MOTIVO_AJUSTE_STOCK;
-          fecharDialogoCasoAberto();
+          voltar();
           _aumentarQuantidadeProduto(produto,
               quantidade + ((await pegarStock(produto))?.quantidade ?? 0));
           await _manipularEntradaI.registarEntrada(Entrada(
@@ -300,8 +302,17 @@ class ProdutosC extends GetxController {
     mostrarDialogoDeLayou(LayoutQuantidade(
         comOpcaoRetirada: true,
         accaoAoFinalizar: (quantidade, opcaoRetiradaSelecionada) async {
-          fecharDialogoCasoAberto();
-          await _retirarProduto(produto, quantidade, opcaoRetiradaSelecionada!);
+          voltar();
+          var nova =
+              ((await pegarStock(produto))?.quantidade ?? 0) - quantidade;
+          _subtrairQuantidadeProduto(produto, nova);
+          var data = DateTime.now();
+          await _manipularSaidaI.registarSaida(Saida(
+              idProduto: produto.id,
+              quantidade: quantidade,
+              estado: Estado.ATIVADO,
+              data: data,
+              motivo: opcaoRetiradaSelecionada));
         },
         titulo: "Retirar quantidade do produto ${produto.nome}"));
   }
@@ -311,15 +322,10 @@ class ProdutosC extends GetxController {
     for (var i = 0; i < lista.length; i++) {
       if (lista[i].id == produto.id) {
         produto.precoCompra = novoPrecoCompra.toDouble();
-        if (produto.stock == null) {
-          produto.stock = Stock(
-              estado: Estado.ATIVADO,
-              idProduto: produto.id,
-              quantidade: quantidade);
-        } else {
-          produto.stock!.quantidade =
-              ((lista[i].stock!.quantidade! + quantidade));
-        }
+        produto.stock = Stock(
+            estado: Estado.ATIVADO,
+            idProduto: produto.id,
+            quantidade: quantidade);
         lista[i] = produto;
         break;
       }
@@ -327,17 +333,14 @@ class ProdutosC extends GetxController {
   }
 
   void _subtrairQuantidadeProduto(Produto produto, int quantidade) {
+    mostrar(quantidade);
+    mostrar(produto.stock);
     for (var i = 0; i < lista.length; i++) {
       if (lista[i].id == produto.id) {
-        if (produto.stock == null) {
-          produto.stock = Stock(
-              estado: Estado.ATIVADO,
-              idProduto: produto.id,
-              quantidade: -quantidade);
-        } else {
-          produto.stock!.quantidade =
-              ((lista[i].stock!.quantidade! - quantidade));
-        }
+        produto.stock = Stock(
+            estado: Estado.ATIVADO,
+            idProduto: produto.id,
+            quantidade: quantidade);
         lista[i] = produto;
         break;
       }
@@ -347,15 +350,10 @@ class ProdutosC extends GetxController {
   void _aumentarQuantidadeProduto(Produto produto, int quantidade) {
     for (var i = 0; i < lista.length; i++) {
       if (lista[i].id == produto.id) {
-        if (produto.stock == null) {
-          produto.stock = Stock(
-              estado: Estado.ATIVADO,
-              idProduto: produto.id,
-              quantidade: quantidade);
-        } else {
-          produto.stock!.quantidade =
-              ((lista[i].stock!.quantidade! + quantidade));
-        }
+        produto.stock = Stock(
+            estado: Estado.ATIVADO,
+            idProduto: produto.id,
+            quantidade: quantidade);
         lista[i] = produto;
         break;
       }
@@ -486,23 +484,6 @@ class ProdutosC extends GetxController {
 
   void terminarSessao() {
     AplicacaoC.terminarSessao();
-  }
-
-  Future<void> _retirarProduto(
-      Produto produto, int quantidade, String opcaoRetiradaSelecionada) async {
-    try {
-      _subtrairQuantidadeProduto(
-          produto, quantidade - ((await pegarStock(produto))?.quantidade ?? 0));
-      var data = DateTime.now();
-      await _manipularSaidaI.registarSaida(Saida(
-          idProduto: produto.id,
-          quantidade: quantidade,
-          estado: Estado.ATIVADO,
-          data: data,
-          motivo: opcaoRetiradaSelecionada));
-    } on Erro catch (e) {
-      mostrarDialogoDeInformacao(e.sms);
-    }
   }
 
   void verEntradas(Produto produto) {

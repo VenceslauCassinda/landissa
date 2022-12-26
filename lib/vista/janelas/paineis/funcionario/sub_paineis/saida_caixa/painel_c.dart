@@ -10,6 +10,7 @@ import 'package:yetu_gestor/fonte_dados/provedores/provedor_saida_caixa.dart';
 import 'package:yetu_gestor/recursos/constantes.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/saida_caixa/layout/layout_add_saida_caixa.dart';
 
+import '../../../../../../dominio/entidades/caixa.dart';
 import '../../../../../../dominio/entidades/estado.dart';
 import '../../../../../../dominio/entidades/saida_caixa.dart';
 import '../../../../../../solucoes_uteis/formato_dado.dart';
@@ -80,6 +81,34 @@ class PainelSaidaCaixaC extends GetxController {
     listaCopia.addAll(lista);
   }
 
+  Future pegarDadosTudo() async {
+    lista.clear();
+    caixaAtual.value = 0;
+    var res = await _manipularSaidaCaixaI.pegarLista();
+    for (var cada in res) {
+      caixaAtual.value += cada.valor ?? 0;
+      lista.add(cada);
+    }
+
+    listaCopia.clear();
+    listaCopia.addAll(lista);
+  }
+
+  Future pegarDadosSaldo() async {
+    lista.clear();
+    caixaAtual.value = 0;
+    var res = await _manipularSaidaCaixaI.pegarLista();
+    for (var cada in res) {
+      if ((cada.motivo ?? "").contains(Caixa.MOTIVO_SALDO)) {
+        caixaAtual.value += cada.valor ?? 0;
+        lista.add(cada);
+      }
+    }
+
+    listaCopia.clear();
+    listaCopia.addAll(lista);
+  }
+
   Future<void> adincionarSaida(
       String valor, String motivo, bool entradaOuSaida) async {
     var v = double.parse(valor);
@@ -141,7 +170,7 @@ class PainelSaidaCaixaC extends GetxController {
       return;
     }
 
-    mostrarDialogoDeLayou(const CircularProgressIndicator());
+    mostrarCarregandoDialogoDeInformacao("Carregando...");
     var todos = await _manipularSaidaCaixaI.pegarLista();
     for (var cada in todos) {
       var depoisDoInicio = ((DateTime(
@@ -184,7 +213,7 @@ class PainelSaidaCaixaC extends GetxController {
         dados.add([
           (formatar(cada.valor ?? 0).toString().contains("-") ? "-" : "+"),
           "${formatar(cada.valor ?? 0)} KZ".replaceAll("-", ""),
-          (cada.motivo ?? "Nenhum"),
+          (cada.motivo ?? "Nenhum").replaceAll(Caixa.MOTIVO_SALDO, ""),
           (formatarData(cada.data!)),
           (formatar(cada.valor ?? 0).toString().contains("-")
               ? "Saída de Caixa"

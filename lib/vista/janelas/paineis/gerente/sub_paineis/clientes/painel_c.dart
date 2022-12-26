@@ -5,12 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:yetu_gestor/contratos/casos_uso/manipular_cliente_I.dart';
 import 'package:yetu_gestor/contratos/casos_uso/manipular_saida_caixa_i.dart';
+import 'package:yetu_gestor/dominio/casos_uso/manipula_stock.dart';
 import 'package:yetu_gestor/dominio/casos_uso/manipular_cliente.dart';
+import 'package:yetu_gestor/dominio/casos_uso/manipular_divida.dart';
+import 'package:yetu_gestor/dominio/casos_uso/manipular_saida.dart';
 import 'package:yetu_gestor/dominio/casos_uso/manipular_saida_caixa.dart';
 import 'package:yetu_gestor/dominio/entidades/cliente.dart';
 import 'package:yetu_gestor/dominio/entidades/funcionario.dart';
 import 'package:yetu_gestor/fonte_dados/provedores/provedor_cliente.dart';
+import 'package:yetu_gestor/fonte_dados/provedores/provedor_divida.dart';
+import 'package:yetu_gestor/fonte_dados/provedores/provedor_saida.dart';
+import 'package:yetu_gestor/fonte_dados/provedores/provedor_stock.dart';
 import 'package:yetu_gestor/recursos/constantes.dart';
+import 'package:yetu_gestor/solucoes_uteis/console.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/layouts/layout_campo.dart';
 
 import '../../../../../../dominio/entidades/estado.dart';
@@ -111,9 +118,20 @@ class PainelClientesC extends GetxController {
         layoutCru: true);
   }
 
-  Future<double> pegarDividaCliente(Cliente lista) async {
+  Future<double> pegarDividaCliente(Cliente cliente) async {
     double total = 0;
-
+    var maniStock = ManipularStock(ProvedorStock());
+    var maniDivida = ManipularDivida(ProvedorDivida(),
+        ManipularSaida(ProvedorSaida(), maniStock), maniStock);
+    var lista = await maniDivida.pegarListaTodasDividas();
+    for (var cada in lista) {
+      if (cada.paga == false) {
+        var c = await _manipularClienteI.pegarClienteDeId(cada.idCliente!);
+        if (c?.nome == cliente.nome) {
+          total += cada.total ?? 0;
+        }
+      }
+    }
     return total;
   }
 }

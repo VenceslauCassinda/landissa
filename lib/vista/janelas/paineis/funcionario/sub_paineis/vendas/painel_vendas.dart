@@ -7,6 +7,7 @@ import 'package:yetu_gestor/dominio/entidades/painel_actual.dart';
 import 'package:yetu_gestor/fonte_dados/padrao_dao/tabelas/tabela_definicoes.dart';
 import 'package:yetu_gestor/solucoes_uteis/console.dart';
 import 'package:yetu_gestor/solucoes_uteis/formato_dado.dart';
+import 'package:yetu_gestor/solucoes_uteis/responsividade.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/painel_funcionario_c.dart';
 
 import '../../../../../../../recursos/constantes.dart';
@@ -193,37 +194,14 @@ class PainelVendas extends StatelessWidget {
                 return Row(
                   children: [
                     Visibility(
-                      visible: permissao,
-                      child: Container(
-                        margin: const EdgeInsets.all(20),
-                        width: 200,
-                        child: ModeloButao(
-                          corButao: primaryColor,
-                          icone: Icons.arrow_circle_down,
-                          corTitulo: Colors.white,
-                          butaoHabilitado: true,
-                          tituloButao: "Recepções",
-                          metodoChamadoNoClique: () {
-                            funcionarioC?.irParaPainel(PainelActual.RECEPCOES);
-                          },
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: permissao,
-                      child: Container(
-                        margin: const EdgeInsets.all(20),
-                        width: 200,
-                        child: ModeloButao(
-                          corButao: primaryColor,
-                          icone: Icons.store,
-                          corTitulo: Colors.white,
-                          butaoHabilitado: true,
-                          tituloButao: "Vendas",
-                          metodoChamadoNoClique: () {
-                            _c.escolherData(context, funcionarioC!);
-                          },
-                        ),
+                      visible: !Responsidade.isMobile(context),
+                      child: LayoutAccoes(
+                          permissao: permissao,
+                          funcionarioC: funcionarioC,
+                          c: _c),
+                      replacement: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: PopupAccoes(funcionarioC: funcionarioC, c: _c),
                       ),
                     ),
                     const Spacer(),
@@ -231,13 +209,13 @@ class PainelVendas extends StatelessWidget {
                       visible: permissao,
                       child: Container(
                         margin: const EdgeInsets.all(20),
-                        width: 200,
+                        width: !Responsidade.isMobile(context) ? 200 : 130,
                         child: ModeloButao(
                           corButao: primaryColor,
                           icone: Icons.add,
                           corTitulo: Colors.white,
                           butaoHabilitado: true,
-                          tituloButao: "Adicionar Produto",
+                          tituloButao: "Adicionar",
                           metodoChamadoNoClique: () {
                             _c.mostrarDialogoProdutos(context);
                           },
@@ -260,6 +238,127 @@ class PainelVendas extends StatelessWidget {
                 ),
               );
             }),
+      ],
+    );
+  }
+}
+
+class PopupAccoes extends StatelessWidget {
+  const PopupAccoes({
+    Key? key,
+    required this.funcionarioC,
+    required VendasC c,
+  })  : _c = c,
+        super(key: key);
+
+  final PainelFuncionarioC? funcionarioC;
+  final VendasC _c;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<int>(
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Card(
+              elevation: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [Text("Ir Para"), Icon(Icons.arrow_drop_down)],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      onSelected: ((value) {
+        if (value == 0) {
+          funcionarioC?.irParaPainel(PainelActual.RECEPCOES);
+          return;
+        }
+        if (value == 1) {
+          _c.escolherData(context, funcionarioC!);
+          return;
+        }
+      }),
+      itemBuilder: ((context) {
+        return [
+          PopupMenuItem(
+            value: 0,
+            child: Row(
+              children: [
+                Text("Recepções"),
+                Spacer(),
+                Icon(Icons.arrow_circle_down_outlined)
+              ],
+            ),
+            onTap: () {},
+          ),
+          PopupMenuItem(
+            value: 1,
+            child: Row(
+              children: [Text("Vendas"), Spacer(), Icon(Icons.store)],
+            ),
+          ),
+        ];
+      }),
+    );
+  }
+}
+
+class LayoutAccoes extends StatelessWidget {
+  const LayoutAccoes({
+    Key? key,
+    required this.permissao,
+    required this.funcionarioC,
+    required VendasC c,
+  })  : _c = c,
+        super(key: key);
+
+  final bool permissao;
+  final PainelFuncionarioC? funcionarioC;
+  final VendasC _c;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Visibility(
+          visible: permissao,
+          child: Container(
+            margin: const EdgeInsets.all(20),
+            width: 200,
+            child: ModeloButao(
+              corButao: primaryColor,
+              icone: Icons.arrow_circle_down,
+              corTitulo: Colors.white,
+              butaoHabilitado: true,
+              tituloButao: "Recepções",
+              metodoChamadoNoClique: () {
+                funcionarioC?.irParaPainel(PainelActual.RECEPCOES);
+              },
+            ),
+          ),
+        ),
+        Visibility(
+          visible: permissao,
+          child: Container(
+            margin: const EdgeInsets.all(20),
+            width: 200,
+            child: ModeloButao(
+              corButao: primaryColor,
+              icone: Icons.store,
+              corTitulo: Colors.white,
+              butaoHabilitado: true,
+              tituloButao: "Vendas",
+              metodoChamadoNoClique: () {
+                _c.escolherData(context, funcionarioC!);
+              },
+            ),
+          ),
+        ),
       ],
     );
   }

@@ -1,7 +1,9 @@
 import 'package:componentes_visuais/componentes/layout_confirmacao_accao.dart';
 import 'package:componentes_visuais/componentes/validadores/validadcao_campos.dart';
 import 'package:componentes_visuais/dialogo/dialogos.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:responsive_layout_builder/responsive_layout_builder.dart';
 import 'package:yetu_gestor/dominio/casos_uso/manipular_fincionario.dart';
 import 'package:yetu_gestor/dominio/casos_uso/manipular_usuario.dart';
 import 'package:yetu_gestor/dominio/entidades/estado.dart';
@@ -9,6 +11,7 @@ import 'package:yetu_gestor/dominio/entidades/nivel_acesso.dart';
 import 'package:yetu_gestor/dominio/entidades/sessao.dart';
 import 'package:yetu_gestor/dominio/entidades/usuario.dart';
 import 'package:yetu_gestor/fonte_dados/erros.dart';
+import 'package:yetu_gestor/fonte_dados/padrao_dao/tabelas/tabela_definicoes.dart';
 import 'package:yetu_gestor/fonte_dados/provedores/provedor_funcionario.dart';
 import 'package:yetu_gestor/fonte_dados/provedores/provedores_usuario.dart';
 import 'package:yetu_gestor/recursos/constantes.dart';
@@ -18,6 +21,7 @@ import 'package:yetu_gestor/vista/janelas/paineis/gerente/layouts/layout_campo.d
 import '../../../../contratos/casos_uso/manipular_funcionario_i.dart';
 import '../../../../contratos/casos_uso/manipular_usuario_i.dart';
 import '../../../../dominio/casos_uso/manipular_definicoes.dart';
+import 'layouts/detalhes.dart';
 
 class PainelAdministradorC extends GetxController {
   RxList<Usuario> usuarios = RxList();
@@ -94,8 +98,22 @@ class PainelAdministradorC extends GetxController {
     }
   }
 
-  void mudar(Usuario? dado) {
+  void mudar(Usuario? dado) async {
     usuario.value = dado;
+    var tela = Get.find<ScreenSize>();
+    if (tela.tablet != null) {
+      mostrarDialogoDeLayou(
+        Container(
+          width: 500,
+          height: 500,
+          child: LayoutDetalhes(
+            c: this,
+            usuario: usuario.value!,
+          ),
+        ),
+      );
+      return;
+    }
   }
 
   Future<void> mostrarDialogoEliminar(Usuario usuario) async {
@@ -131,6 +149,7 @@ class PainelAdministradorC extends GetxController {
         mostrarDialogoDeInformacao("Preencha todos os campos!");
         return;
       }
+      voltar();
       Get.defaultDialog(
           title: "",
           content: LayoutConfirmacaoAccao(
@@ -164,11 +183,12 @@ class PainelAdministradorC extends GetxController {
   void definirId() {
     mostrarDialogoDeLayou(LayoutCampo(
       accaoAoFinalizar: (dado) async {
+        voltar();
         ManipularDefinicoes def = Get.find();
         var atuais = await def.pegarDefinicoesActuais();
         atuais.idLicenca = dado;
         await def.actualizarDefinicoes(atuais);
-        voltar();
+        mostrarDialogoDeInformacao("Id de Licença definido!");
       },
       titulo: "Introduza o Id da Licença!",
     ));
@@ -177,13 +197,28 @@ class PainelAdministradorC extends GetxController {
   void definirLicenca() {
     mostrarDialogoDeLayou(LayoutCampo(
       accaoAoFinalizar: (dado) async {
+        voltar();
         ManipularDefinicoes def = Get.find();
         var atuais = await def.pegarDefinicoesActuais();
         atuais.licenca = dado;
         await def.actualizarDefinicoes(atuais);
-        voltar();
+        mostrarDialogoDeInformacao("Licença definida!");
       },
       titulo: "Introduza a Licença!",
     ));
+  }
+
+  void validarLicenca() async {
+    mostrarCarregandoDialogoDeInformacao("Validando...");
+    try {
+      ManipularDefinicoes def = Get.find();
+      await def.validarLicencaDaNet(
+          await def.pegarDefinicoesActuais(), DateTime.now());
+      voltar();
+      mostrarDialogoDeInformacao("Validado!");
+    } on Erro catch (e) {
+      voltar();
+      mostrarDialogoDeInformacao(e.sms);
+    }
   }
 }

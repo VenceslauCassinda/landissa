@@ -6,6 +6,7 @@ import 'package:responsive_layout_builder/responsive_layout_builder.dart';
 import 'package:yetu_gestor/dominio/entidades/funcionario.dart';
 import 'package:yetu_gestor/dominio/entidades/nivel_acesso.dart';
 import 'package:yetu_gestor/dominio/entidades/painel_actual.dart';
+import 'package:yetu_gestor/solucoes_uteis/responsividade.dart';
 import 'package:yetu_gestor/solucoes_uteis/utils.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/dinheiro_sobra/painel.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/recepcoes/painel_c.dart';
@@ -46,24 +47,24 @@ class Corpo extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.put(context);
     return ResponsiveLayoutBuilder(builder: (context, size) {
-      Get.put(size);
+    Get.put(size);
       return Scaffold(
-        drawer: size.tablet != null
+        drawer: !Responsidade.isDesktop(context)
             ? Container(
                 color: branca,
-                width: MediaQuery.of(context).size.width * .4,
+                width: MediaQuery.of(context).size.width * .5,
                 child: GavetaNavegacao(
                   linkImagem: "",
                   c: _c,
                 ),
               )
             : null,
-        appBar: size.tablet != null
+        appBar: !Responsidade.isDesktop(context)
             ? AppBar(
                 backgroundColor: primaryColor,
               )
             : null,
-        body: size.tablet != null
+        body: !Responsidade.isDesktop(context)
             ? pegarLayoutPainelAtual()
             : Row(
                 children: [

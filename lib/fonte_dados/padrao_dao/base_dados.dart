@@ -18,7 +18,6 @@ import '../../dominio/casos_uso/manipular_usuario.dart';
 import '../../dominio/entidades/definicoes.dart';
 import '../../dominio/entidades/dinheiro_sobra.dart';
 import '../../dominio/entidades/divida.dart';
-import '../../dominio/entidades/divida.dart';
 import '../../dominio/entidades/entidade.dart';
 import '../../dominio/entidades/estado.dart';
 import '../../dominio/entidades/item_venda.dart';
@@ -121,8 +120,9 @@ class BancoDados extends _$BancoDados {
   MigrationStrategy get migration {
     return MigrationStrategy(onCreate: (Migrator m) async {
       await m.createAll();
-      var usuario = Usuario.registo("admin", "11111111");
+      var usuario = Usuario.registo("admin", "1234567811");
       usuario.nivelAcesso = NivelAcesso.ADMINISTRADOR;
+
       await ManipularUsuario(ProvedorUsuario()).registarUsuario(usuario);
       await DefinicoesDao(this).adicionarDefinicoes(Definicoes(
           estado: Estado.ATIVADO,

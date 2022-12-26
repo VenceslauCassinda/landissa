@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_layout_builder/responsive_layout_builder.dart';
 import 'package:yetu_gestor/recursos/constantes.dart';
+import 'package:yetu_gestor/solucoes_uteis/responsividade.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/administrador/painel_administrador_c.dart';
 import 'componentes/gaveta.dart';
 import 'sub_paineis/painel_direito.dart';
@@ -13,10 +14,10 @@ class PainelAdministrador extends StatelessWidget {
       builder: ((context, size) {
         Get.put(size);
         return Scaffold(
-          drawer: size.tablet != null
+          drawer: size.tablet != null || Responsidade.isMobile(context) == true
               ? Container(
                   color: branca,
-                  width: MediaQuery.of(context).size.width * .4,
+                  width: MediaQuery.of(context).size.width * .5,
                   child: const GavetaNavegacao(
                     linkImagem: "",
                   ),

@@ -7,6 +7,7 @@ import 'package:yetu_gestor/dominio/casos_uso/manipular_usuario.dart';
 import 'package:yetu_gestor/dominio/entidades/funcionario.dart';
 import 'package:yetu_gestor/fonte_dados/provedores/provedor_funcionario.dart';
 import 'package:yetu_gestor/fonte_dados/provedores/provedores_usuario.dart';
+import 'package:yetu_gestor/solucoes_uteis/responsividade.dart';
 import 'package:yetu_gestor/vista/aplicacao_c.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/dinheiro_sobra/painel_c.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/dividas_encomendas_gerais/painel_c.dart';
@@ -79,7 +80,7 @@ class PainelFuncionarioC extends GetxController {
     painelActual.value = PainelActual(indicadorPainel: indice, valor: valor);
 
     ScreenSize tela = Get.find();
-    if (tela.tablet != null) {
+    if (tela.tablet != null||tela.mobile != null) {
       voltar();
     }
   }

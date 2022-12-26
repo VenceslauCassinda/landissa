@@ -7,6 +7,7 @@ abstract class ProvedorSaidaI {
   Future<List<Saida>> pegarLista();
   Future<List<Saida>> pegarListaDoProduto(int idProduto);
   Future<Saida?> pegarSaidaDeProdutoDeId(int id);
+  Future<Saida?> pegarSaidaDeProdutoDeIdEmotivo(int id, String motivo);
   Future removerTudo();
   Future removerAntes(DateTime data);
 }

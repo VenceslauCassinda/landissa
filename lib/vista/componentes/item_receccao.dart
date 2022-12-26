@@ -43,14 +43,29 @@ class ItemRececcao extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                Text("Preço do Lote: ${formatar(receccao.precoLote ?? 0)}"),
-                Text(
-                    "Quantidade de Lotes: ${formatarInteiroComMilhares(receccao.quantidadeLotes ?? 0)}"),
-                Text(
-                    "Quantidade de Unidades por Lote: ${formatarInteiroComMilhares(receccao.quantidadePorLotes ?? 0)}"),
-                Text(
-                    "Custo de Aquisição: ${formatar(receccao.custoAquisicao ?? 0)}"),
-                Text("Total Gasto: ${formatar(receccao.custoTotal)}"),
+                Visibility(
+                    visible: receccao.quantidadeLotes != 0,
+                    child: Text(
+                        "Preço do Lote: ${formatar(receccao.precoLote ?? 0)}")),
+                Visibility(
+                  visible: receccao.quantidadeLotes != 0,
+                  child: Text(
+                      "Quantidade de Lotes: ${formatarInteiroComMilhares(receccao.quantidadeLotes ?? 0)}"),
+                ),
+                Visibility(
+                  visible: receccao.quantidadeLotes != 0,
+                  child: Text(
+                      "Quantidade de Unidades por Lote: ${formatarInteiroComMilhares(receccao.quantidadePorLotes ?? 0)}"),
+                ),
+                Visibility(
+                  visible: receccao.quantidadeLotes != 0,
+                  child: Text(
+                      "Custo de Aquisição: ${formatar(receccao.custoAquisicao ?? 0)}"),
+                ),
+                Visibility(
+                    visible: receccao.quantidadeLotes != 0,
+                    child:
+                        Text("Total Gasto: ${formatar(receccao.custoTotal)}")),
               ],
             ),
             Spacer(),

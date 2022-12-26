@@ -42,6 +42,14 @@ class GavetaNavegacao extends StatelessWidget {
                       var c = Get.find<PainelAdministradorC>();
                       await c.pegarUsuarios();
                     }),
+                ItemDaGaveta(
+                    cor: branca,
+                    icone: Icons.logout,
+                    titulo: "Sair",
+                    metodoQuandoItemClicado: () async {
+                      var c = Get.find<PainelAdministradorC>();
+                      c.terminarSessao();
+                    }),
               ],
             ),
           ),

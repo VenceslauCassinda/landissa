@@ -35,6 +35,9 @@ class LayoutUsuarios extends StatelessWidget {
                       aoClicar: () {
                         _c.mudar(element);
                       },
+                      aoEditar: () {
+                        _c.mudar(element);
+                      },
                       aoEliminar: _c.indiceTabActual == 3
                           ? () {
                               _c.mostrarDialogoEliminar(element);

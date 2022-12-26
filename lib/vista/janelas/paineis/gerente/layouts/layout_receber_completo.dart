@@ -9,11 +9,13 @@ import 'package:componentes_visuais/componentes/validadores/validadcao_campos.da
 import 'package:componentes_visuais/dialogo/dialogos.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:yetu_gestor/dominio/entidades/produto.dart';
 import 'package:yetu_gestor/dominio/entidades/saida.dart';
 import 'package:yetu_gestor/solucoes_uteis/console.dart';
 import 'package:yetu_gestor/solucoes_uteis/formato_dado.dart';
 
 import '../../../../../recursos/constantes.dart';
+import '../../../../componentes/tab_bar.dart';
 
 class LayoutReceberCompleto extends StatelessWidget {
   late ObservadorCampoTexto _observadorCampoTexto;
@@ -25,9 +27,11 @@ class LayoutReceberCompleto extends StatelessWidget {
   var custoTotal = 0.0.obs;
   var precoCompra = 0.obs;
   var pagavel = false.obs;
+  var indiceAtual = 0.obs;
+  Produto? produto;
 
   final Function(int quantidadePorLotes, int quantidadeLotes, double precoLote,
-      double custo, bool pagavel) accaoAoFinalizar;
+      double custo, bool pagavel, bool modoCompleto) accaoAoFinalizar;
 
   String? quantidadePorLotes, quantidadeLotes, precoLote, custo = "0";
   final String titulo;
@@ -37,6 +41,7 @@ class LayoutReceberCompleto extends StatelessWidget {
   LayoutReceberCompleto(
       {required this.accaoAoFinalizar,
       required this.titulo,
+      this.produto,
       quantidade,
       required this.comOpcaoRetirada}) {
     _observadorCampoTexto = ObservadorCampoTexto();
@@ -47,260 +52,402 @@ class LayoutReceberCompleto extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(100),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Text(
-                titulo,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            CampoTexto(
-              textoPadrao: precoLote,
-              context: context,
-              campoBordado: false,
-              icone: const Icon(Icons.lock),
-              tipoCampoTexto: TipoCampoTexto.numero,
-              dicaParaCampo: "Preço do Lote",
-              metodoChamadoNaInsersao: (String valor) {
-                precoLote = valor;
-                actualizarDados();
-                _observadorCampoTexto.observarCampo(
-                    valor, TipoCampoTexto.preco);
-                if (valor.isEmpty) {
-                  _observadorCampoTexto.mudarValorValido(
-                      true, TipoCampoTexto.preco);
-                }
-                _observadorButoes.mudarValorFinalizarCadastroInstituicao([
-                  precoLote ?? "",
-                  quantidadeLotes ?? "",
-                  quantidadePorLotes ?? "",
-                  custo ?? "",
-                ], [
-                  _observadorCampoTexto.valorPrecoValido.value,
-                  _observadorCampoTexto2.valorNumeroValido.value,
-                  _observadorCampoTexto3.valorNumeroValido.value,
-                  _observadorCampoTexto4.valorPrecoValido.value,
-                ]);
-              },
-            ),
-            Obx(() {
-              return _observadorCampoTexto.valorPrecoValido.value == true
-                  ? Container()
-                  : LabelErros(
-                      sms: "Preço inválido!",
-                    );
-            }),
-            const SizedBox(
-              height: 20,
-            ),
-            CampoTexto(
-              textoPadrao: quantidadeLotes,
-              context: context,
-              campoBordado: false,
-              icone: const Icon(Icons.lock),
-              tipoCampoTexto: TipoCampoTexto.numero,
-              dicaParaCampo: "Quantidade de Lotes",
-              metodoChamadoNaInsersao: (String valor) {
-                quantidadeLotes = valor;
-                actualizarDados();
-                _observadorCampoTexto2.observarCampo(
-                    valor, TipoCampoTexto.numero);
-                if (valor.isEmpty) {
-                  _observadorCampoTexto2.mudarValorValido(
-                      true, TipoCampoTexto.numero);
-                }
-                _observadorButoes.mudarValorFinalizarCadastroInstituicao([
-                  precoLote ?? "",
-                  quantidadeLotes ?? "",
-                  quantidadePorLotes ?? "",
-                  custo ?? "",
-                ], [
-                  _observadorCampoTexto.valorPrecoValido.value,
-                  _observadorCampoTexto2.valorNumeroValido.value,
-                  _observadorCampoTexto3.valorNumeroValido.value,
-                  _observadorCampoTexto4.valorPrecoValido.value,
-                ]);
-              },
-            ),
-            Obx(() {
-              return _observadorCampoTexto2.valorNumeroValido.value == true
-                  ? Container()
-                  : LabelErros(
-                      sms: "Quantidade inválida!",
-                    );
-            }),
-            const SizedBox(
-              height: 20,
-            ),
-            CampoTexto(
-              textoPadrao: quantidadePorLotes,
-              context: context,
-              campoBordado: false,
-              icone: const Icon(Icons.lock),
-              tipoCampoTexto: TipoCampoTexto.numero,
-              dicaParaCampo: "Quantidade de Unidades por Lotes",
-              metodoChamadoNaInsersao: (String valor) {
-                quantidadePorLotes = valor;
-                actualizarDados();
-                _observadorCampoTexto3.observarCampo(
-                    valor, TipoCampoTexto.numero);
-                if (valor.isEmpty) {
-                  _observadorCampoTexto3.mudarValorValido(
-                      true, TipoCampoTexto.numero);
-                }
-                _observadorButoes.mudarValorFinalizarCadastroInstituicao([
-                  precoLote ?? "",
-                  quantidadeLotes ?? "",
-                  quantidadePorLotes ?? "",
-                  custo ?? "",
-                ], [
-                  _observadorCampoTexto.valorPrecoValido.value,
-                  _observadorCampoTexto2.valorNumeroValido.value,
-                  _observadorCampoTexto3.valorNumeroValido.value,
-                  _observadorCampoTexto4.valorPrecoValido.value,
-                ]);
-              },
-            ),
-            Obx(() {
-              return _observadorCampoTexto3.valorNumeroValido.value == true
-                  ? Container()
-                  : LabelErros(
-                      sms: "Quantidade inválida!",
-                    );
-            }),
-            const SizedBox(
-              height: 20,
-            ),
-            CampoTexto(
-              textoPadrao: custo == "0" ? null : custo,
-              context: context,
-              campoBordado: false,
-              icone: const Icon(Icons.lock),
-              tipoCampoTexto: TipoCampoTexto.numero,
-              dicaParaCampo: "Custo de Aquisição",
-              metodoChamadoNaInsersao: (String valor) {
-                custo = valor;
-                actualizarDados();
-                _observadorCampoTexto4.observarCampo(
-                    valor, TipoCampoTexto.preco);
-                if (valor.isEmpty) {
-                  _observadorCampoTexto4.mudarValorValido(
-                      true, TipoCampoTexto.preco);
-                }
-                _observadorButoes.mudarValorFinalizarCadastroInstituicao([
-                  precoLote ?? "",
-                  quantidadeLotes ?? "",
-                  quantidadePorLotes ?? "",
-                  custo ?? "",
-                ], [
-                  _observadorCampoTexto.valorPrecoValido.value,
-                  _observadorCampoTexto2.valorNumeroValido.value,
-                  _observadorCampoTexto3.valorNumeroValido.value,
-                  _observadorCampoTexto4.valorPrecoValido.value,
-                ]);
-              },
-            ),
-            Obx(() {
-              return _observadorCampoTexto4.valorPrecoValido.value == true
-                  ? Container()
-                  : LabelErros(
-                      sms: "Custo inválido!",
-                    );
-            }),
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Pagavel: "),
-                Obx(() {
-                  return Checkbox(
-                      value: pagavel.value,
-                      onChanged: (novo) {
-                        pagavel.value = novo ?? false;
-                      });
-                }),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Obx(() {
-              return Text(
-                "Quantidade Total: ${formatarInteiroComMilhares(quantidadeTotal.value)}",
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              );
-            }),
-            Obx(() {
-              return Text(
-                "Custo Total: ${formatar(custoTotal.value)}",
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              );
-            }),
-            Obx(() {
-              return Text(
-                "Preço de Compra(Unidade): ${formatarInteiroComMilhares(precoCompra.value)}",
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              );
-            }),
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              children: [
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  width: MediaQuery.of(context).size.width * .15,
-                  child: ModeloButao(
-                    tituloButao: "Cancelar",
-                    corButao: primaryColor,
-                    corTitulo: Colors.white,
-                    butaoHabilitado: true,
-                    metodoChamadoNoClique: () async {
-                      fecharDialogoCasoAberto();
-                    },
+    return Column(
+      children: [
+        ModeloTabBar(
+          listaItens: ["Modo Completo", "Modo Simples"],
+          indiceTabInicial: 0,
+          accao: (indice) {
+            indiceAtual.value = indice;
+          },
+        ),
+        Container(
+          height: MediaQuery.of(context).size.height * .5,
+          child: SingleChildScrollView(
+            child: Obx(() {
+              return Visibility(
+                visible: indiceAtual.value == 0,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          titulo,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CampoTexto(
+                        textoPadrao: precoLote,
+                        context: context,
+                        campoBordado: false,
+                        icone: const Icon(Icons.lock),
+                        tipoCampoTexto: TipoCampoTexto.numero,
+                        dicaParaCampo: "Preço do Lote",
+                        metodoChamadoNaInsersao: (String valor) {
+                          precoLote = valor;
+                          actualizarDados();
+                          _observadorCampoTexto.observarCampo(
+                              valor, TipoCampoTexto.preco);
+                          if (valor.isEmpty) {
+                            _observadorCampoTexto.mudarValorValido(
+                                true, TipoCampoTexto.preco);
+                          }
+                          _observadorButoes
+                              .mudarValorFinalizarCadastroInstituicao([
+                            precoLote ?? "",
+                            quantidadeLotes ?? "",
+                            quantidadePorLotes ?? "",
+                            custo ?? "",
+                          ], [
+                            _observadorCampoTexto.valorPrecoValido.value,
+                            _observadorCampoTexto2.valorNumeroValido.value,
+                            _observadorCampoTexto3.valorNumeroValido.value,
+                            _observadorCampoTexto4.valorPrecoValido.value,
+                          ]);
+                        },
+                      ),
+                      Obx(() {
+                        return _observadorCampoTexto.valorPrecoValido.value ==
+                                true
+                            ? Container()
+                            : LabelErros(
+                                sms: "Preço inválido!",
+                              );
+                      }),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CampoTexto(
+                        textoPadrao: quantidadeLotes,
+                        context: context,
+                        campoBordado: false,
+                        icone: const Icon(Icons.lock),
+                        tipoCampoTexto: TipoCampoTexto.numero,
+                        dicaParaCampo: "Quantidade de Lotes",
+                        metodoChamadoNaInsersao: (String valor) {
+                          quantidadeLotes = valor;
+                          actualizarDados();
+                          _observadorCampoTexto2.observarCampo(
+                              valor, TipoCampoTexto.numero);
+                          if (valor.isEmpty) {
+                            _observadorCampoTexto2.mudarValorValido(
+                                true, TipoCampoTexto.numero);
+                          }
+                          _observadorButoes
+                              .mudarValorFinalizarCadastroInstituicao([
+                            precoLote ?? "",
+                            quantidadeLotes ?? "",
+                            quantidadePorLotes ?? "",
+                            custo ?? "",
+                          ], [
+                            _observadorCampoTexto.valorPrecoValido.value,
+                            _observadorCampoTexto2.valorNumeroValido.value,
+                            _observadorCampoTexto3.valorNumeroValido.value,
+                            _observadorCampoTexto4.valorPrecoValido.value,
+                          ]);
+                        },
+                      ),
+                      Obx(() {
+                        return _observadorCampoTexto2.valorNumeroValido.value ==
+                                true
+                            ? Container()
+                            : LabelErros(
+                                sms: "Quantidade inválida!",
+                              );
+                      }),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CampoTexto(
+                        textoPadrao: quantidadePorLotes,
+                        context: context,
+                        campoBordado: false,
+                        icone: const Icon(Icons.lock),
+                        tipoCampoTexto: TipoCampoTexto.numero,
+                        dicaParaCampo: "Quantidade de Unidades por Lotes",
+                        metodoChamadoNaInsersao: (String valor) {
+                          quantidadePorLotes = valor;
+                          actualizarDados();
+                          _observadorCampoTexto3.observarCampo(
+                              valor, TipoCampoTexto.numero);
+                          if (valor.isEmpty) {
+                            _observadorCampoTexto3.mudarValorValido(
+                                true, TipoCampoTexto.numero);
+                          }
+                          _observadorButoes
+                              .mudarValorFinalizarCadastroInstituicao([
+                            precoLote ?? "",
+                            quantidadeLotes ?? "",
+                            quantidadePorLotes ?? "",
+                            custo ?? "",
+                          ], [
+                            _observadorCampoTexto.valorPrecoValido.value,
+                            _observadorCampoTexto2.valorNumeroValido.value,
+                            _observadorCampoTexto3.valorNumeroValido.value,
+                            _observadorCampoTexto4.valorPrecoValido.value,
+                          ]);
+                        },
+                      ),
+                      Obx(() {
+                        return _observadorCampoTexto3.valorNumeroValido.value ==
+                                true
+                            ? Container()
+                            : LabelErros(
+                                sms: "Quantidade inválida!",
+                              );
+                      }),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CampoTexto(
+                        textoPadrao: custo == "0" ? null : custo,
+                        context: context,
+                        campoBordado: false,
+                        icone: const Icon(Icons.lock),
+                        tipoCampoTexto: TipoCampoTexto.numero,
+                        dicaParaCampo: "Custo de Aquisição",
+                        metodoChamadoNaInsersao: (String valor) {
+                          custo = valor;
+                          actualizarDados();
+                          _observadorCampoTexto4.observarCampo(
+                              valor, TipoCampoTexto.preco);
+                          if (valor.isEmpty) {
+                            _observadorCampoTexto4.mudarValorValido(
+                                true, TipoCampoTexto.preco);
+                          }
+                          _observadorButoes
+                              .mudarValorFinalizarCadastroInstituicao([
+                            precoLote ?? "",
+                            quantidadeLotes ?? "",
+                            quantidadePorLotes ?? "",
+                            custo ?? "",
+                          ], [
+                            _observadorCampoTexto.valorPrecoValido.value,
+                            _observadorCampoTexto2.valorNumeroValido.value,
+                            _observadorCampoTexto3.valorNumeroValido.value,
+                            _observadorCampoTexto4.valorPrecoValido.value,
+                          ]);
+                        },
+                      ),
+                      Obx(() {
+                        return _observadorCampoTexto4.valorPrecoValido.value ==
+                                true
+                            ? Container()
+                            : LabelErros(
+                                sms: "Custo inválido!",
+                              );
+                      }),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Pagavel: "),
+                          Obx(() {
+                            return Checkbox(
+                                value: pagavel.value,
+                                onChanged: (novo) {
+                                  pagavel.value = novo ?? false;
+                                });
+                          }),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Obx(() {
+                        return Text(
+                          "Quantidade Total: ${formatarInteiroComMilhares(quantidadeTotal.value)}",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        );
+                      }),
+                      Obx(() {
+                        return Text(
+                          "Custo Total: ${formatar(custoTotal.value)}",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        );
+                      }),
+                      Obx(() {
+                        return Text(
+                          "Preço de Compra(Unidade): ${formatarInteiroComMilhares(precoCompra.value)}",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        );
+                      }),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            width: MediaQuery.of(context).size.width * .15,
+                            child: ModeloButao(
+                              tituloButao: "Cancelar",
+                              corButao: primaryColor,
+                              corTitulo: Colors.white,
+                              butaoHabilitado: true,
+                              metodoChamadoNoClique: () async {
+                                fecharDialogoCasoAberto();
+                              },
+                            ),
+                          ),
+                          Obx(() {
+                            return Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              width: MediaQuery.of(context).size.width * .15,
+                              child: ModeloButao(
+                                corButao: Colors.white.withOpacity(.8),
+                                butaoHabilitado: _observadorButoes
+                                    .butaoFinalizarCadastroInstituicao.value,
+                                tituloButao: "Finalizar",
+                                metodoChamadoNoClique: () {
+                                  accaoAoFinalizar(
+                                      int.parse(quantidadePorLotes!),
+                                      int.parse(quantidadeLotes!),
+                                      double.parse(precoLote!),
+                                      double.parse(custo!),
+                                      pagavel.value,
+                                      true);
+                                },
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                Obx(() {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    width: MediaQuery.of(context).size.width * .15,
-                    child: ModeloButao(
-                      corButao: Colors.white.withOpacity(.8),
-                      butaoHabilitado: _observadorButoes
-                          .butaoFinalizarCadastroInstituicao.value,
-                      tituloButao: "Finalizar",
-                      metodoChamadoNoClique: () {
-                        accaoAoFinalizar(
-                            int.parse(quantidadePorLotes!),
-                            int.parse(quantidadeLotes!),
-                            double.parse(precoLote!),
-                            double.parse(custo!),
-                            pagavel.value);
-                      },
-                    ),
-                  );
-                }),
-              ],
-            ),
-          ],
+                replacement: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          titulo,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CampoTexto(
+                        textoPadrao: quantidadePorLotes,
+                        context: context,
+                        campoBordado: false,
+                        icone: const Icon(Icons.lock),
+                        tipoCampoTexto: TipoCampoTexto.numero,
+                        dicaParaCampo: "Quantidade de Unidades",
+                        metodoChamadoNaInsersao: (String valor) {
+                          quantidadePorLotes = valor;
+                          actualizarDados();
+                          _observadorCampoTexto3.observarCampo(
+                              valor, TipoCampoTexto.numero);
+                          if (valor.isEmpty) {
+                            _observadorCampoTexto3.mudarValorValido(
+                                true, TipoCampoTexto.numero);
+                          }
+                          _observadorButoes
+                              .mudarValorFinalizarCadastroInstituicao([
+                            quantidadePorLotes ?? "",
+                          ], [
+                            _observadorCampoTexto3.valorNumeroValido.value,
+                          ]);
+                        },
+                      ),
+                      Obx(() {
+                        return _observadorCampoTexto3.valorNumeroValido.value ==
+                                true
+                            ? Container()
+                            : LabelErros(
+                                sms: "Quantidade inválida!",
+                              );
+                      }),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Pagavel: "),
+                          Obx(() {
+                            return Checkbox(
+                                value: pagavel.value,
+                                onChanged: (novo) {
+                                  pagavel.value = novo ?? false;
+                                });
+                          }),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            width: MediaQuery.of(context).size.width * .15,
+                            child: ModeloButao(
+                              tituloButao: "Cancelar",
+                              corButao: primaryColor,
+                              corTitulo: Colors.white,
+                              butaoHabilitado: true,
+                              metodoChamadoNoClique: () async {
+                                fecharDialogoCasoAberto();
+                              },
+                            ),
+                          ),
+                          Obx(() {
+                            return Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              width: MediaQuery.of(context).size.width * .15,
+                              child: ModeloButao(
+                                corButao: Colors.white.withOpacity(.8),
+                                butaoHabilitado: _observadorButoes
+                                    .butaoFinalizarCadastroInstituicao.value,
+                                tituloButao: "Finalizar",
+                                metodoChamadoNoClique: () {
+                                  accaoAoFinalizar(
+                                      int.parse(quantidadePorLotes ?? "0"),
+                                      1,
+                                      (produto?.precoCompra ?? 0) *
+                                          int.parse(quantidadePorLotes ?? "0"),
+                                      0,
+                                      pagavel.value,
+                                      false);
+                                },
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
         ),
-      ),
+      ],
     );
   }
 

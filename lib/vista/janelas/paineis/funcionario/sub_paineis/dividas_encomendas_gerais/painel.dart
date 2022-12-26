@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:yetu_gestor/dominio/entidades/funcionario.dart';
 import 'package:yetu_gestor/dominio/entidades/nivel_acesso.dart';
 import 'package:yetu_gestor/solucoes_uteis/formato_dado.dart';
+import 'package:yetu_gestor/solucoes_uteis/responsividade.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/dividas_encomendas_gerais/layout/item_divida.dart';
 import '../../../../../../../recursos/constantes.dart';
 import '../../../../../componentes/pesquisa.dart';
@@ -68,70 +69,20 @@ class PainelDividas extends StatelessWidget {
               Container(
                 child: Obx(
                   () => Text(
-                    "DÍVIDAS NÃO PAGAS: ${formatar(_c.totalDividasNaoPagas.value)} KZ",
+                    "NÃO PAGAS: ${formatar(_c.totalDividasNaoPagas.value)} KZ",
                     style: TextStyle(color: primaryColor, fontSize: 30),
                   ),
                 ),
               ),
               const Spacer(),
-              ModeloButao(
-                corButao: primaryColor,
-                corTitulo: Colors.white,
-                butaoHabilitado: true,
-                tituloButao: "Todas",
-                metodoChamadoNoClique: () {
-                  _c.lista.clear();
-                  _c.pegarLista();
-                },
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              ModeloButao(
-                icone: Icons.check_box_outlined,
-                corButao: primaryColor,
-                corTitulo: Colors.white,
-                butaoHabilitado: true,
-                tituloButao: "Pagas",
-                metodoChamadoNoClique: () {
-                  _c.pegarDados(true);
-                },
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              ModeloButao(
-                corButao: primaryColor,
-                icone: Icons.check_box_outline_blank_rounded,
-                corTitulo: Colors.white,
-                butaoHabilitado: true,
-                tituloButao: "Não Pagas",
-                metodoChamadoNoClique: () {
-                  _c.pegarDados(false);
-                },
-              ),
-              const SizedBox(
-                width: 40,
-              ),
               Visibility(
-                visible: _c.funcionario.nivelAcesso == NivelAcesso.GERENTE,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: ModeloButao(
-                    corButao: primaryColor,
-                    icone: Icons.delete,
-                    corTitulo: Colors.white,
-                    butaoHabilitado: true,
-                    tituloButao: "Limpar",
-                    metodoChamadoNoClique: () {
-                      _c.mostrarDialogoEliminar(context, true);
-                    },
-                    metodoChamadoNoLongoClique: () {
-                      _c.mostrarDialogoEliminar(context, false);
-                    },
-                  ),
-                ),
+                visible: !Responsidade.isMobile(context),
+                child: LayoutFiltros(c: _c),
+                replacement: PopupFiltros(c: _c),
               ),
+              SizedBox(
+                width: 20,
+              )
             ],
           ),
         ),
@@ -188,6 +139,165 @@ class PainelDividas extends StatelessWidget {
             metodoChamadoNoClique: () {
               _c.mostrarDialogoMostrarClientes();
             },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PopupFiltros extends StatelessWidget {
+  const PopupFiltros({
+    Key? key,
+    required PainelDividasC c,
+  })  : _c = c,
+        super(key: key);
+
+  final PainelDividasC _c;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<int>(
+      child: Row(
+        children: [
+          Card(
+            elevation: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [Text("Filtrar"), Icon(Icons.arrow_drop_down)],
+              ),
+            ),
+          ),
+        ],
+      ),
+      onSelected: ((value) {
+        if (value == 0) {
+          _c.lista.clear();
+          _c.pegarLista();
+          return;
+        }
+        if (value == 1) {
+          _c.pegarDados(true);
+          return;
+        }
+        if (value == 2) {
+          _c.pegarDados(false);
+          return;
+        }
+        if (value == 3) {
+          _c.mostrarDialogoEliminar(context, false);
+          return;
+        }
+      }),
+      itemBuilder: ((context) {
+        return [
+          PopupMenuItem(
+            value: 0,
+            child: Text("Todas"),
+            onTap: () {},
+          ),
+          PopupMenuItem(
+            value: 1,
+            child: Row(
+              children: [
+                Text("Pagas"),
+                Spacer(),
+                Icon(Icons.check_box_outlined)
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            value: 2,
+            child: Row(
+              children: [
+                Text("Não Pagas"),
+                Spacer(),
+                Icon(Icons.check_box_outline_blank_rounded)
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            value: 3,
+            child: Row(
+              children: [Text("Limpar"), Spacer(), Icon(Icons.delete)],
+            ),
+          ),
+        ];
+      }),
+    );
+  }
+}
+
+class LayoutFiltros extends StatelessWidget {
+  const LayoutFiltros({
+    Key? key,
+    required PainelDividasC c,
+  })  : _c = c,
+        super(key: key);
+
+  final PainelDividasC _c;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        ModeloButao(
+          corButao: primaryColor,
+          corTitulo: Colors.white,
+          butaoHabilitado: true,
+          tituloButao: "Todas",
+          metodoChamadoNoClique: () {
+            _c.lista.clear();
+            _c.pegarLista();
+          },
+        ),
+        SizedBox(
+          width: 20,
+        ),
+        ModeloButao(
+          icone: Icons.check_box_outlined,
+          corButao: primaryColor,
+          corTitulo: Colors.white,
+          butaoHabilitado: true,
+          tituloButao: "Pagas",
+          metodoChamadoNoClique: () {
+            _c.pegarDados(true);
+          },
+        ),
+        SizedBox(
+          width: 20,
+        ),
+        ModeloButao(
+          corButao: primaryColor,
+          icone: Icons.check_box_outline_blank_rounded,
+          corTitulo: Colors.white,
+          butaoHabilitado: true,
+          tituloButao: "Não Pagas",
+          metodoChamadoNoClique: () {
+            _c.pegarDados(false);
+          },
+        ),
+        const SizedBox(
+          width: 40,
+        ),
+        Visibility(
+          visible: _c.funcionario.nivelAcesso == NivelAcesso.GERENTE,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: ModeloButao(
+              corButao: primaryColor,
+              icone: Icons.delete,
+              corTitulo: Colors.white,
+              butaoHabilitado: true,
+              tituloButao: "Limpar",
+              metodoChamadoNoClique: () {
+                _c.mostrarDialogoEliminar(context, true);
+              },
+              metodoChamadoNoLongoClique: () {
+                _c.mostrarDialogoEliminar(context, false);
+              },
+            ),
           ),
         ),
       ],

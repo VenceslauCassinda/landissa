@@ -5,6 +5,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
 
 import 'pdf_api.dart';
+import 'precos_pdf.dart';
 
 class GeralPdf {
   static Future<File> generate(String titulo, List<String> cabecalho,
@@ -38,7 +39,7 @@ class GeralPdf {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              Text("Data: ${formatarData(data, semHora: true )}"),
+              Text("Data: ${formatarData(data, semHora: true)}"),
             ],
           ),
         ],
@@ -82,19 +83,7 @@ class GeralPdf {
     );
   }
 
-  static Widget buildFooter() => Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Divider(),
-          SizedBox(height: 2 * PdfPageFormat.mm),
-          Text(
-              "Processado por: YETUGESTOR ERP, DA: OKU SANGA (SU) - SOLUÇÕES TECNOLÓGICAS",
-              style: TextStyle(fontSize: 5)),
-          Text("Desenvolvedor: VENCESLAU EVANDRO CASSINDA MOREIRA",
-              style: TextStyle(fontSize: 5)),
-          Divider(),
-        ],
-      );
+  static Widget buildFooter() => buildFooterGeral();
 
   static buildSimpleText({
     required String title,

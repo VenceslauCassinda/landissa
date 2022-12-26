@@ -63,7 +63,6 @@ class ManipularDefinicoes implements ManipularDefinicoesI {
 
   @override
   Future<void> autenticaSistema() async {
-    mostrarCarregandoDialogoDeInformacao("Autenticando o sistema");
     var hoje = DateTime.now();
     var atuais = await pegarDefinicoesActuais();
 
@@ -83,29 +82,10 @@ class ManipularDefinicoes implements ManipularDefinicoesI {
     await actualizarDefinicoes(atuais);
 
     if (atuais.dataExpiracao == null) {
-      var licencaNet = await pegarLicencaNet();
-      var licenca = licencaNet["licenca"];
-
-      if (atuais.licenca != licenca) {
-        throw Erro(
-            "Licença inválida!\nPor favor contacte o administrador do sistema para obter uma licença válida!");
-      }
-
-      var arrayDataExpiracao =
-          licencaNet["data_expiracao"].toString().split("-");
-      var dataExpiracao = DateTime(int.parse(arrayDataExpiracao[2]),
-          int.parse(arrayDataExpiracao[1]), int.parse(arrayDataExpiracao[0]));
-
-      if (hoje.isAfter(dataExpiracao) == true) {
-        throw Erro(
-            "Licença já Expirada!\nPor favor contacte o administrador do sistema para obter uma nova licença válida!");
-      }
-      atuais.dataExpiracao = dataExpiracao;
-      atuais.licenciado = true;
-      await actualizarDefinicoes(atuais);
+      await validarLicencaDaNet(atuais, hoje);
     } else {
       if (hoje.isAfter(atuais.dataExpiracao!) == true) {
-        throw Erro(
+        throw ErroLicencaExpirada(
             "Licença Expirada!\nPor favor contacte o administrador do sistema para obter uma nova licença válida!");
       }
       return;
@@ -113,5 +93,44 @@ class ManipularDefinicoes implements ManipularDefinicoesI {
     if (atuais.licenciado == true) {
       return;
     }
+  }
+
+  Future<void> validarLicencaDaNet(Definicoes atuais, DateTime hoje) async {
+    var licencaNet = await pegarLicencaNet();
+    var licenca = licencaNet["licenca"];
+
+    if (atuais.licenca != licenca) {
+      throw Erro(
+          "Licença inválida!\nPor favor contacte o administrador do sistema para obter uma licença válida!");
+    }
+
+    var dataExpiracao;
+
+    try {
+      var arrayDataExpiracao =
+          licencaNet["data_expiracao"].toString().split("-");
+      dataExpiracao = DateTime(int.parse(arrayDataExpiracao[2]),
+          int.parse(arrayDataExpiracao[1]), int.parse(arrayDataExpiracao[0]));
+    } on Exception catch (e) {
+      throw Erro("Dados Inválidos do Servidor!");
+    }
+
+    if (hoje.isAfter(dataExpiracao) == true) {
+      atuais.licenciado = false;
+      atuais.licenca = "";
+      await actualizarDefinicoes(atuais);
+      throw Erro(
+          "Licença já Expirada!\nPor favor contacte o administrador do sistema para obter uma nova licença válida!");
+    }
+    if (licencaNet["usada"] != null) {
+      atuais.licenciado = false;
+      atuais.licenca = "";
+      await actualizarDefinicoes(atuais);
+      throw Erro(
+          "Licença já Usada!\nPor favor contacte o administrador do sistema para obter uma nova licença válida!");
+    }
+    atuais.dataExpiracao = dataExpiracao;
+    atuais.licenciado = true;
+    await actualizarDefinicoes(atuais);
   }
 }

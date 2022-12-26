@@ -146,19 +146,7 @@ class PrecosPdf {
   //   );
   // }
 
-  static Widget buildFooter(Invoice invoice) => Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Divider(),
-          SizedBox(height: 2 * PdfPageFormat.mm),
-          Text(
-              "Processado por: YETUGESTOR ERP, DA: OKU SANGA (SU) - SOLUÇÕES TECNOLÓGICAS",
-              style: TextStyle(fontSize: 5)),
-          Text("Desenvolvedor: VENCESLAU EVANDRO CASSINDA MOREIRA",
-              style: TextStyle(fontSize: 5)),
-          Divider(),
-        ],
-      );
+  static Widget buildFooter(Invoice invoice) => buildFooterGeral(invoice);
 
   static buildSimpleText({
     required String title,
@@ -197,3 +185,17 @@ class PrecosPdf {
     );
   }
 }
+
+Widget buildFooterGeral([invoice]) => Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Divider(),
+        SizedBox(height: 2 * PdfPageFormat.mm),
+        Text(
+            "Processado por: LANDISSA ERP, DA: OKU SANGA (SU) - SOLUÇÕES TECNOLÓGICAS",
+            style: TextStyle(fontSize: 5)),
+        Text("Desenvolvedor: VENCESLAU EVANDRO CASSINDA MOREIRA",
+            style: TextStyle(fontSize: 5)),
+        Divider(),
+      ],
+    );

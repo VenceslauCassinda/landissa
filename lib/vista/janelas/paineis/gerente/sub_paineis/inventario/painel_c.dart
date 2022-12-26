@@ -11,8 +11,6 @@ import 'package:yetu_gestor/dominio/entidades/produto.dart';
 import 'package:yetu_gestor/dominio/entidades/saida.dart';
 import 'package:yetu_gestor/dominio/entidades/stock.dart';
 import 'package:yetu_gestor/fonte_dados/provedores/provedor_saida.dart';
-import 'package:yetu_gestor/solucoes_uteis/console.dart';
-
 import '../../../../../../contratos/casos_uso/manipular_produto_i.dart';
 import '../../../../../../dominio/casos_uso/manipula_stock.dart';
 import '../../../../../../dominio/casos_uso/manipular_preco.dart';
@@ -29,6 +27,9 @@ import '../../../funcionario/sub_paineis/vendas/layouts/mesa_venda/mesa_venda.da
 
 class PainelInventarioC extends GetxController {
   var produtos = <Produto>[].obs;
+  var produtosCopia = <Produto>[];
+  var totalVendas = 0.0.obs;
+  var totalLucros = 0.0.obs;
   final Funcionario funcionario;
   late ManipularProdutoI _manipularProdutoI;
   late ManipularStockI _manipularStockI;
@@ -53,18 +54,27 @@ class PainelInventarioC extends GetxController {
       var s = await _manipularStockI.pegarStockDoProdutoDeId(cada.id ?? -1);
       var precos = await _manipularPrecoI.pegarPrecoProdutoDeId(cada.id ?? -1);
       var maiorPreco = 0;
-      if (precos.length == 1) {
-        maiorPreco = (precos[0].preco ?? 0).toInt();
+      if (precos.isNotEmpty) {
+        if (precos.length == 1) {
+          maiorPreco = (precos[0].preco ?? 0).toInt();
+        } else {
+          maiorPreco = (precos[0].preco ?? 0) > (precos[1].preco ?? 0)
+              ? (precos[0].preco ?? 0) ~/ (precos[0].quantidade ?? 0)
+              : (precos[1].preco ?? 0) ~/ (precos[1].quantidade ?? 0);
+        }
+        cada.precoGeral = maiorPreco.toDouble();
+        cada.quantidade = (s?.quantidade ?? 0);
+        cada.dinheiro = (s?.quantidade ?? 0) * cada.precoGeral;
+        cada.investimento = (s?.quantidade ?? 0) * (cada.precoCompra ?? 0);
+        cada.lucro = cada.dinheiro - cada.investimento;
       } else {
-        maiorPreco = (precos[0].preco ?? 0) > (precos[1].preco ?? 0)
-            ? (precos[0].preco ?? 0) ~/ (precos[0].quantidade ?? 0)
-            : (precos[1].preco ?? 0) ~/ (precos[1].quantidade ?? 0);
+        cada.precoGeral = 0;
+        cada.quantidade = (s?.quantidade ?? 0);
+        cada.dinheiro = 0;
       }
-      cada.precoGeral = maiorPreco.toDouble();
-      cada.quantidade = (s?.quantidade ?? 0);
-      cada.dinheiro = (s?.quantidade ?? 0) * cada.precoGeral;
       produtos.add(cada);
     }
+    produtosCopia.addAll(produtos);
   }
 
   void mostrarDialogoNovaVenda(BuildContext context) {
@@ -78,15 +88,34 @@ class PainelInventarioC extends GetxController {
 
   Future<void> calcularDiferenca(int indice, String dado) async {
     var produto = produtos[indice];
-    produto.quantidadeExistente = int.parse(dado);
-    produto.diferenca = produto.quantidade - int.parse(dado);
-    produto.vendaEstimado = produto.diferenca * produto.precoGeral;
+    if (dado.isEmpty) {
+      produto.quantidadeExistente = 0;
+      produto.diferenca = 0;
+      produto.vendaEstimado = 0;
+      produto.lucroEstimado = 0;
+    } else {
+      produto.quantidadeExistente = int.parse(dado);
+      produto.diferenca = produto.quantidade - int.parse(dado);
+      produto.vendaEstimado = produto.diferenca * produto.precoGeral;
+      produto.lucroEstimado = produto.vendaEstimado -
+          (produto.diferenca) * (produto.precoCompra ?? 0);
+    }
+
+    totalVendas.value = 0;
+    totalLucros.value = 0;
 
     for (var i = 0; i < produtos.length; i++) {
       if (produtos[i].nome == produto.nome) {
         produtos[i] = produto;
-        break;
       }
+    }
+    for (var i = 0; i < produtosCopia.length; i++) {
+      if (produtosCopia[i].nome == produto.nome) {
+        produtosCopia[i] = produto;
+      }
+
+      totalVendas.value += produtosCopia[i].vendaEstimado;
+      totalLucros.value += produtosCopia[i].lucroEstimado;
     }
   }
 
@@ -114,61 +143,84 @@ class PainelInventarioC extends GetxController {
             pergunta:
                 "Deseja mesmo realizar esta tarefa?\nEsta acção não pode ser revertida!\nSeus produtos irão sofrer baixa de Stock!",
             accaoAoConfirmar: () async {
-              fecharDialogoCasoAberto();
+              voltar();
               gerarRelatorio();
             },
             accaoAoCancelar: () {}),
         layoutCru: true);
   }
 
-  void gerarRelatorio() async {
-    mostrarCarregandoDialogoDeInformacao("Fazendo Inventário");
+  void gerarRelatorio({bool? modoDemo}) async {
+    mostrarCarregandoDialogoDeInformacao("Fazendo Demonstração de Inventário");
     List<List<String>> listaItens = [];
     var hoje = DateTime.now();
+    double totalVendas = 0;
+    double totalLucro = 0;
     var maniStock = ManipularSaida(ProvedorSaida(), _manipularStockI);
     for (var cada in produtos) {
-      await maniStock.registarSaida(Saida(
-          estado: Estado.ATIVADO,
-          idProduto: cada.id,
-          quantidade: cada.diferenca,
-          motivo: Saida.MOTIVO_INVENTARIO,
-          data: hoje));
+      if (modoDemo == false || modoDemo == null) {
+        await maniStock.registarSaida(Saida(
+            estado: Estado.ATIVADO,
+            idProduto: cada.id,
+            quantidade: cada.diferenca,
+            motivo: Saida.MOTIVO_INVENTARIO,
+            data: hoje));
+      }
+      totalVendas += cada.vendaEstimado;
+      totalLucro += cada.lucroEstimado;
       listaItens.add([
         (cada.nome ?? "SEM REGISTO"),
         formatar(cada.precoGeral),
         formatarInteiroComMilhares(cada.quantidade),
         formatar(cada.dinheiro),
-        formatarInteiroComMilhares(cada.quantidadeExistente),
+        formatarInteiroComMilhares(cada.quantidadeExistente ?? 0),
         formatarInteiroComMilhares(cada.diferenca),
         formatar(cada.vendaEstimado),
+        formatar(cada.lucroEstimado),
       ]);
     }
-    gerarPDF(listaItens, hoje);
+    gerarPDF(listaItens, hoje, totalVendas, totalLucro, modoDemo: modoDemo);
+    if (modoDemo == false || modoDemo == null) {
+      produtos.clear();
+      produtosCopia.clear();
+      await pegarDados();
+    }
   }
 
-  void gerarPDF(List<List<String>> dados, DateTime data) async {
+  void gerarPDF(List<List<String>> dados, DateTime data, double totalVendas,
+      double totalLucro,
+      {bool? modoDemo}) async {
     try {
       var pdfFile = await GeralPdf.generate(
-        "INVENTÁRIO",
-        [
-          "Produto",
-          "Preço de Venda",
-          "Quantidade Recebida",
-          "Venda Esperada",
-          "Quantidade Existente",
-          "Quantidade Vendida",
-          "Venda Estimada",
-        ],
-        dados,
-        data,
-      );
+          modoDemo == true ? "DEMONSTRAÇÃO DE INVENTÁRIO" : "INVENTÁRIO",
+          [
+            "Produto",
+            "Preço de Venda",
+            "Qtd Recebida",
+            "Venda Esperada",
+            "Qtd Existente",
+            "Qtd Vendida",
+            "Venda Est.",
+            "Lucro Est.",
+          ],
+          dados,
+          data,
+          informacaoExtra:
+              "Total Estimado de Vendas: ${formatar(totalVendas)} \nTotal Estimado de Lucro: ${formatar(totalLucro)}");
       voltar();
-      produtos.clear();
-      await pegarDados();
       PdfApi.openFile(pdfFile);
     } catch (e) {
       mostrarDialogoDeInformacao(
           "O arquivo ainda está aberto noutro programa!\nPor favor feche!");
+    }
+  }
+
+  void aoPesquisar(String dado) async {
+    produtos.clear();
+    for (var cada in produtosCopia) {
+      if ((cada.nome ?? "").toLowerCase().contains(dado.toLowerCase())) {
+        produtos.add(cada);
+      }
     }
   }
 }

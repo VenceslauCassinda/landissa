@@ -5,6 +5,11 @@ class Caixa {
   final String caixaDigitalAcomulado;
   final String totalDespesas;
 
-  Caixa({required this.caixaDigital, required this.caixaFisico, required this.caixaFisicoAcomulado, required this.caixaDigitalAcomulado, required this.totalDespesas});
-
+  static String MOTIVO_SALDO = "S_S_S_S_S";
+  Caixa(
+      {required this.caixaDigital,
+      required this.caixaFisico,
+      required this.caixaFisicoAcomulado,
+      required this.caixaDigitalAcomulado,
+      required this.totalDespesas});
 }

@@ -26,10 +26,12 @@ class LayoutProdutos extends StatelessWidget {
               }
               return;
             },
-            child: ItemProduto(
-              produto: lista[indice],
-              c: c,
-              futurePegarStock: c?.pegarStock(lista[indice]),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 10, left: 20, right: 20),
+              child: ItemProduto(
+                produto: lista[indice],
+                c: c,
+              ),
             ),
           );
         });

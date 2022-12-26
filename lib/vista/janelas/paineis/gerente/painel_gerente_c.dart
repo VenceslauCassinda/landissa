@@ -16,8 +16,10 @@ import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/saida_
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/vendas/layouts/mesa_venda/mesa_venda.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/vendas/layouts/vendas_c.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/clientes/painel_c.dart';
+import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/desperdicio/painel.dart';
+import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/desperdicio/painel_c.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/entradas/layouts/entradas_c.dart';
-import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/historico/historico_c.dart';
+import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/resumo/resumo_c.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/inventario/painel_c.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/investimento/painel_c.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/pagamentos/pagamentos_c.dart';
@@ -99,11 +101,11 @@ class PainelGerenteC extends GetxController {
             painelActual.value.indicadorPainel ||
         PainelActual.VENDAS_ANTIGA == indicadorPainel) {
       Get.delete<VendasC>();
-      Get.delete<HistoricoC>();
+      Get.delete<PainelResumoC>();
     }
     if (PainelActual.VENDAS == painelActual.value.indicadorPainel ||
         PainelActual.VENDAS_ANTIGA == indicadorPainel) {
-      Get.delete<HistoricoC>();
+      Get.delete<PainelResumoC>();
     }
     if (PainelActual.SAIDA_CAIXA == painelActual.value.indicadorPainel) {
       Get.delete<PainelSaidaCaixaC>();
@@ -116,6 +118,9 @@ class PainelGerenteC extends GetxController {
     }
     if (PainelActual.RELATORIO == painelActual.value.indicadorPainel) {
       Get.delete<PainelRelatorioC>();
+    }
+    if (PainelActual.DESPERDICIOS == painelActual.value.indicadorPainel) {
+      Get.delete<PainelDesperdicioC>();
     }
     if (PainelActual.PERFIL == painelActual.value.indicadorPainel) {
       Get.delete<PainelPerfilC>();
@@ -152,7 +157,7 @@ class PainelGerenteC extends GetxController {
     }
 
     ScreenSize tela = Get.find();
-    if (tela.tablet != null) {
+    if (tela.tablet != null || tela.mobile != null) {
       voltar();
     }
   }

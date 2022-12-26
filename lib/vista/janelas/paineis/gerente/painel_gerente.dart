@@ -13,6 +13,7 @@ import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/saida_
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/painel_gerente_c.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/clientes/painel.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/definicoes/painel.dart';
+import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/desperdicio/painel.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/entradas/painel_entradas.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/investimento/painel.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/pagamentos/painel_pagamentos.dart';
@@ -21,13 +22,14 @@ import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/relatorio/
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/saidas/painel_saidas.dart';
 
 import '../../../../dominio/entidades/nivel_acesso.dart';
+import '../../../../solucoes_uteis/responsividade.dart';
 import '../../../componentes/pesquisa.dart';
 import '../funcionario/sub_paineis/dividas_encomendas_gerais/painel.dart';
 import '../funcionario/sub_paineis/recepcoes/painel.dart';
 import '../funcionario/sub_paineis/vendas/painel_vendas.dart';
 import 'componentes/gaveta.dart';
 import 'sub_paineis/funcionarios/painel_direito.dart';
-import 'sub_paineis/historico/historico.dart';
+import 'sub_paineis/resumo/resumo.dart';
 import 'sub_paineis/inventario/painel.dart';
 import 'sub_paineis/produtos/painel_produtos.dart';
 
@@ -52,11 +54,11 @@ class CorpoGerente extends StatelessWidget {
     return ResponsiveLayoutBuilder(builder: (context, size) {
       Get.put(size);
       return Visibility(
-        visible: size.tablet != null,
+        visible: size.tablet != null || Responsidade.isMobile(context) == true,
         child: Scaffold(
           drawer: Container(
             color: branca,
-            width: MediaQuery.of(context).size.width * .4,
+            width: MediaQuery.of(context).size.width * .5,
             child: GavetaNavegacao(
               linkImagem: "",
               c: _c,
@@ -169,7 +171,7 @@ class CorpoGerente extends StatelessWidget {
         );
       }
       if (_c.painelActual.value.indicadorPainel == PainelActual.VENDAS) {
-        return PainelHistorico(
+        return PainelResumo(
           accaoAoVoltar: () {
             _c.irParaPainel(PainelActual.FUNCIONARIOS);
           },
@@ -207,6 +209,14 @@ class CorpoGerente extends StatelessWidget {
         return PainelClientes(
           _c,
           _c.funcionarioActual,
+          accaoAoVoltar: () {
+            _c.irParaPainel(PainelActual.FUNCIONARIOS);
+          },
+        );
+      }
+      if (_c.painelActual.value.indicadorPainel == PainelActual.DESPERDICIOS) {
+        return PainelDesperdicio(
+          gerenteC: _c,
           accaoAoVoltar: () {
             _c.irParaPainel(PainelActual.FUNCIONARIOS);
           },

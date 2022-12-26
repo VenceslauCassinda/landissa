@@ -115,7 +115,11 @@ class PainelClientes extends StatelessWidget {
                                   future: _clientesC
                                       .pegarDividaCliente(_clientesC.lista[i]),
                                   builder: (context, snapshot) {
-                                    return Text("Dívida:");
+                                    if (snapshot.data == null) {
+                                      return const Text("...");
+                                    }
+                                    return Text(
+                                        "Dívida: ${formatar(snapshot.data!)}");
                                   }),
                             ),
                           ),

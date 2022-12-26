@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:yetu_gestor/dominio/entidades/painel_actual.dart';
 import 'package:yetu_gestor/dominio/entidades/produto.dart';
+import 'package:yetu_gestor/solucoes_uteis/responsividade.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/painel_gerente_c.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/entradas/layouts/entradas.dart';
 
@@ -64,8 +65,9 @@ class PainelEntradas extends StatelessWidget {
                 "ENTRADAS",
                 style: TextStyle(color: primaryColor, fontSize: 20),
               ),
-              Spacer(),Container(
-                width: 250,
+              Spacer(),
+              Container(
+                width: !Responsidade.isMobile(context) ? 250 : 130,
                 child: Visibility(
                   visible: _painelGerenteC.funcionarioActual.nivelAcesso ==
                       NivelAcesso.GERENTE,
@@ -85,7 +87,7 @@ class PainelEntradas extends StatelessWidget {
                 width: 20,
               ),
               Container(
-                width: 250,
+                width: !Responsidade.isMobile(context) ? 250 : 130,
                 child: Visibility(
                   visible: _painelGerenteC.funcionarioActual.nivelAcesso ==
                       NivelAcesso.GERENTE,

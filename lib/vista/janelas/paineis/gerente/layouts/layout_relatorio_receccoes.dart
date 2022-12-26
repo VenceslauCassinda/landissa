@@ -85,6 +85,7 @@ class LayoutRelatorioRececcoes extends StatelessWidget {
               butaoHabilitado: true,
               tituloButao: "Gerar Arquivo PDF",
               metodoChamadoNoClique: () {
+                mostrarCarregandoDialogoDeInformacao("Carregando...");
                 gerarPDF();
               },
             ),

@@ -40,10 +40,12 @@ class Receccao {
     this.dataPagamento,
   });
 
-  int get quantidadeRecebida =>
-      (quantidadeLotes ?? 0) * (quantidadePorLotes ?? 0);
-  double get custoTotal =>
-      (quantidadeLotes ?? 0) * (precoLote ?? 0) + (custoAquisicao ?? 0);
+  int get quantidadeRecebida => (quantidadeLotes ?? 0) == 0
+      ? (quantidadePorLotes ?? 0)
+      : (quantidadeLotes ?? 0) * (quantidadePorLotes ?? 0);
+  double get custoTotal => (quantidadeLotes ?? 0) == 0
+      ? (quantidadePorLotes ?? 0) * (produto!.precoCompra ?? -1)
+      : (quantidadeLotes ?? 0) * (precoLote ?? 0) + (custoAquisicao ?? 0);
   int get precoCompraProduto => custoTotal ~/ quantidadeRecebida;
   TabelaRececcaoCompanion toCompanion(bool nullToAbsent) {
     return TabelaRececcaoCompanion(

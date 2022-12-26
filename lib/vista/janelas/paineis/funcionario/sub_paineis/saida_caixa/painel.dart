@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:yetu_gestor/dominio/entidades/funcionario.dart';
 import 'package:yetu_gestor/dominio/entidades/nivel_acesso.dart';
+import 'package:yetu_gestor/solucoes_uteis/responsividade.dart';
 import 'package:yetu_gestor/vista/componentes/item_saida_caixa.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/saida_caixa/painel_c.dart';
 
@@ -52,12 +53,117 @@ class PainelSaidaCaixa extends StatelessWidget {
             c.irParaPainel(PainelActual.INICIO);
           }),
         ),
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 20),
-          width: double.infinity,
-          child: const Text(
-            "OPERAÇÕES DE CAIXA",
-            style: TextStyle(color: primaryColor, fontSize: 30),
+        Visibility(
+          visible: Responsidade.isMobile(context),
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 20),
+            width: double.infinity,
+            child: Row(
+              children: [
+                const Text(
+                  "OPERAÇÕES DE CAIXA",
+                  style: TextStyle(color: primaryColor, fontSize: 30),
+                ),
+                Spacer(),
+                PopupMenuButton<int>(
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Card(
+                          elevation: 3,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Text("Filtros"),
+                                Icon(Icons.arrow_drop_down)
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  onSelected: ((value) {
+                    if (value == 0) {
+                      saidaCaixaC.pegarDadosSaldo();
+                      return;
+                    }
+                    if (value == 1) {
+                      saidaCaixaC.pegarDadosTudo();
+                      return;
+                    }
+                  }),
+                  itemBuilder: ((context) {
+                    return [
+                      PopupMenuItem(
+                        value: 0,
+                        child: Row(
+                          children: [
+                            Text("Saídas de Saldo"),
+                            Spacer(),
+                            Icon(Icons.arrow_circle_up_outlined)
+                          ],
+                        ),
+                        onTap: () {},
+                      ),
+                      PopupMenuItem(
+                        value: 1,
+                        child: Row(
+                          children: [
+                            Text("Todas"),
+                            Spacer(),
+                            Icon(Icons.all_inbox)
+                          ],
+                        ),
+                      ),
+                    ];
+                  }),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Visibility(
+          visible: !Responsidade.isMobile(context),
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 20),
+            width: double.infinity,
+            child: Row(
+              children: [
+                const Text(
+                  "OPERAÇÕES DE CAIXA",
+                  style: TextStyle(color: primaryColor, fontSize: 30),
+                ),
+                Spacer(),
+                ModeloButao(
+                  corButao: primaryColor,
+                  icone: Icons.arrow_circle_up_outlined,
+                  corTitulo: Colors.white,
+                  butaoHabilitado: true,
+                  tituloButao: "Saída de Saldo",
+                  metodoChamadoNoClique: () {
+                    saidaCaixaC.pegarDadosSaldo();
+                  },
+                  metodoChamadoNoLongoClique: () {},
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                ModeloButao(
+                  corButao: primaryColor,
+                  icone: Icons.all_inbox,
+                  corTitulo: Colors.white,
+                  butaoHabilitado: true,
+                  tituloButao: "Todas",
+                  metodoChamadoNoClique: () {
+                    saidaCaixaC.pegarDadosTudo();
+                  },
+                  metodoChamadoNoLongoClique: () {},
+                )
+              ],
+            ),
           ),
         ),
         Padding(

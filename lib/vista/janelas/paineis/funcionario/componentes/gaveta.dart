@@ -69,10 +69,10 @@ class GavetaNavegacao extends StatelessWidget {
                       }),
                   ItemDaGaveta(
                       cor: branca,
-                      icone: Icons.people,
-                      titulo: "Clientes",
+                      icone: Icons.monetization_on,
+                      titulo: "Caixa",
                       metodoQuandoItemClicado: () async {
-                        c.irParaPainel(PainelActual.CLIENTES);
+                        c.irParaPainel(PainelActual.SAIDA_CAIXA);
                       }),
                   ItemDaGaveta(
                       cor: branca,
@@ -83,10 +83,10 @@ class GavetaNavegacao extends StatelessWidget {
                       }),
                   ItemDaGaveta(
                       cor: branca,
-                      icone: Icons.monetization_on,
-                      titulo: "Caixa",
+                      icone: Icons.people,
+                      titulo: "Clientes",
                       metodoQuandoItemClicado: () async {
-                        c.irParaPainel(PainelActual.SAIDA_CAIXA);
+                        c.irParaPainel(PainelActual.CLIENTES);
                       }),
                   ItemDaGaveta(
                       cor: branca,

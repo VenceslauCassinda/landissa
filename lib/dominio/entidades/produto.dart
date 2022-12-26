@@ -11,13 +11,17 @@ class Produto {
   int? estado;
   String? nome;
   double? precoCompra;
+  double? desperdicio;
   bool? recebivel;
   int diferenca = 0;
   int quantidade = 0;
-  int quantidadeExistente = 0;
+  int? quantidadeExistente;
   double vendaEstimado = 0;
+  double lucroEstimado = 0;
+  double lucro = 0;
   double precoGeral = 0;
   double dinheiro = 0;
+  double investimento = 0;
   Produto(
       {this.id,
       this.estado,

@@ -10,39 +10,58 @@ class ItemUsuario extends StatelessWidget {
   final Usuario usuario;
   final Function aoClicar;
   final Function? aoEliminar;
+  final Function? aoEditar;
   const ItemUsuario({
     Key? key,
     required this.usuario,
     required this.aoClicar,
     required this.aoEliminar,
+    this.aoEditar,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 5,
-      child: ListTile(
+      child: InkWell(
         onTap: () {
           aoClicar();
         },
-        leading: Container(
-            width: 50,
-            child: ImagemNoCirculo(
-                Icon(
-                  Icons.person,
-                  color: primaryColor,
-                ),
-                20)),
-        title: Text("${usuario.nomeUsuario}"),
-        subtitle: Text("Estado: ${Estado.paraTexto(usuario.estado!)}"),
-        trailing: Container(
-          width: 300,
+        child: Container(
+          height: 100,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text("Usuário: ${NivelAcesso.paraTexto(usuario.nivelAcesso!)}"),
-              SizedBox(
-                width: 10,
+              Container(
+                  width: 50,
+                  margin: EdgeInsets.all(20),
+                  child: ImagemNoCirculo(
+                      Icon(
+                        Icons.person,
+                        color: primaryColor,
+                      ),
+                      20)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Nome: ${usuario.nomeUsuario}"),
+                  Text("Estado: ${Estado.paraTexto(usuario.estado!)}"),
+                  Text(
+                      "Usuário: ${NivelAcesso.paraTexto(usuario.nivelAcesso!)}")
+                ],
+              ),
+              Spacer(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconeItem(
+                      metodoQuandoItemClicado: () {
+                        aoEditar!();
+                      },
+                      icone: Icons.edit,
+                      titulo: "Editar"),
+                ],
               ),
               Visibility(
                 visible: aoEliminar != null,
@@ -52,6 +71,9 @@ class ItemUsuario extends StatelessWidget {
                     },
                     icone: Icons.delete,
                     titulo: "Remover"),
+              ),
+              SizedBox(
+                width: 20,
               )
             ],
           ),

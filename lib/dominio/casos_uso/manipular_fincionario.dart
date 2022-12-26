@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:yetu_gestor/dominio/entidades/funcionario.dart';
 import 'package:yetu_gestor/dominio/entidades/nivel_acesso.dart';
 import 'package:yetu_gestor/dominio/entidades/usuario.dart';
+import 'package:yetu_gestor/solucoes_uteis/console.dart';
 
 import '../../contratos/casos_uso/manipular_funcionario_i.dart';
 import '../../contratos/casos_uso/manipular_usuario_i.dart';
@@ -40,10 +41,10 @@ class ManipularFuncionario implements ManipularFuncionarioI {
       throw ErroFuncionarioJaExiste("FUNCIONARIO JA EXISTENTE!");
     }
     var novoUsuario = Usuario.registo(nomeUsuario, dado.palavraPasse);
+    novoUsuario.palavraPasse = dado.palavraPasse;
     var id = await _manipularUsuarioI.registarUsuario(novoUsuario);
     dado.idUsuario = id;
     await _provedorFuncionarioI.adicionarFuncionario(dado);
-    novoUsuario.palavraPasse = "";
     if (nomeUsuario == "admin") {
       novoUsuario.nivelAcesso = NivelAcesso.ADMINISTRADOR;
     }

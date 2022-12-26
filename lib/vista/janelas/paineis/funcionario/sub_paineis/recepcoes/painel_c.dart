@@ -147,16 +147,30 @@ class RecepcoesC extends GetxController {
   }
 
   void mostrarDialogoReceberCompleto(Produto produto) {
-    mostrarDialogoDeLayou(LayoutReceberCompleto(
-        comOpcaoRetirada: false,
-        accaoAoFinalizar: (int quantidadePorLotes, int quantidadeLotes,
-            precoLote, double custo, bool pagavel) async {
-          var motivo = Entrada.MOTIVO_ABASTECIMENTO;
-          fecharDialogoCasoAberto();
-          await _receberProduto(produto, quantidadePorLotes, quantidadeLotes,
-              precoLote, custo, pagavel, motivo);
-        },
-        titulo: "Receber produto ${produto.nome}"));
+    mostrarDialogoDeLayou(
+        LayoutReceberCompleto(
+            produto: produto,
+            comOpcaoRetirada: false,
+            accaoAoFinalizar: (int quantidadePorLotes,
+                int quantidadeLotes,
+                precoLote,
+                double custo,
+                bool pagavel,
+                bool modoCompleto) async {
+              var motivo = Entrada.MOTIVO_ABASTECIMENTO;
+              fecharDialogoCasoAberto();
+              await _receberProduto(
+                  produto,
+                  quantidadePorLotes,
+                  quantidadeLotes,
+                  precoLote,
+                  custo,
+                  pagavel,
+                  motivo,
+                  modoCompleto);
+            },
+            titulo: "Receber produto ${produto.nome}"),
+        layoutCru: true);
   }
 
   Future<void> _receberProduto(
@@ -166,7 +180,8 @@ class RecepcoesC extends GetxController {
       double precoLote,
       double custo,
       bool pagavel,
-      String motivo) async {
+      String motivo,
+      bool modoCompleto) async {
     var motivo = Entrada.MOTIVO_ABASTECIMENTO;
     var receccao2 = Receccao(
         paga: false,

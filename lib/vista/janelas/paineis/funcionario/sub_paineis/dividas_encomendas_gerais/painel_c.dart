@@ -37,6 +37,7 @@ import '../../../../../../fonte_dados/provedores/provedor_produto.dart';
 import '../../../../../../fonte_dados/provedores/provedor_saida.dart';
 import '../../../../../../fonte_dados/provedores/provedor_stock.dart';
 import '../../../../../../recursos/constantes.dart';
+import '../../../../../../solucoes_uteis/formato_dado.dart';
 import '../../../../../componentes/item_produto.dart';
 import '../../../../../componentes/pesquisa.dart';
 import '../vendas/layouts/detalhes_venda.dart';
@@ -55,8 +56,8 @@ class PainelDividasC extends GetxController {
 
   PainelDividasC(this.funcionario) {
     var maniStock = ManipularStock(ProvedorStock());
-    _manipularDividaI = ManipularDivida(
-        ProvedorDivida(), ManipularSaida(ProvedorSaida(), maniStock), maniStock);
+    _manipularDividaI = ManipularDivida(ProvedorDivida(),
+        ManipularSaida(ProvedorSaida(), maniStock), maniStock);
     _manipularClienteI = ManipularCliente(ProvedorCliente());
     _manipularFuncionarioI = ManipularFuncionario(
         ManipularUsuario(ProvedorUsuario()), ProveedorFuncionario());
@@ -165,14 +166,16 @@ class PainelDividasC extends GetxController {
       List<Preco> precos, Cliente cliente, Produto produto) {
     mostrarDialogoDeLayou(Column(
       children: [
-        Text("Seleccione o Preço"),
+        Text("Seleccione: "),
         SizedBox(
           height: 20,
         ),
         Column(
           children: precos
               .map((e) => ModeloItemLista(
-                    tituloItem: "${e.preco ?? "Sem Registo"}",
+                    tituloItem:
+                        "${formatarInteiroComMilhares(e.quantidade ?? 0)} --> ${formatar(e.preco ?? 0)}",
+                    itemComentado: false,
                     metodoChamadoAoClicarItem: () {
                       voltar();
                       mostrarDialogoDeLayou(LayoutQuantidade(

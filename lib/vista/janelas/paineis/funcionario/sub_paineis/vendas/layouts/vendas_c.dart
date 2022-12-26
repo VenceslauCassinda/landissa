@@ -18,6 +18,7 @@ import 'package:yetu_gestor/dominio/entidades/venda.dart';
 import 'package:yetu_gestor/fonte_dados/provedores/provedor_pagamento.dart';
 import 'package:yetu_gestor/recursos/constantes.dart';
 import 'package:yetu_gestor/solucoes_uteis/formato_dado.dart';
+import 'package:yetu_gestor/solucoes_uteis/utils.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/recepcoes/layouts/layouts_produtos_completo.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/sub_paineis/vendas/layouts/mesa_venda/mesa_venda.dart';
 import 'package:yetu_gestor/vista/janelas/paineis/funcionario/painel_funcionario_c.dart';
@@ -124,8 +125,12 @@ class VendasC extends GetxController {
     totalDividaPagas.value = 0.0;
     var res = await _manipularDividaI.pegarListaTodasDividas();
     for (var cada in res) {
-      if (cada.idFuncionarioPagante == funcionario?.id && cada.paga == true) {
-        totalDividaPagas.value += cada.total ?? 0;
+      if (cada.dataPagamento != null) {
+        if (cada.idFuncionarioPagante == funcionario?.id &&
+            cada.paga == true &&
+            comapararDatas(data, cada.dataPagamento!)) {
+          totalDividaPagas.value += cada.total ?? 0;
+        }
       }
     }
   }

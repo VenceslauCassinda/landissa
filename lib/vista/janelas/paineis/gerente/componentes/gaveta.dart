@@ -40,7 +40,7 @@ class GavetaNavegacao extends StatelessWidget {
                     future: c.inicializarFuncionario(),
                     builder: (c, s) {
                       if (s.data == null) {
-                        return CircularProgressIndicator();
+                        return const CircularProgressIndicator();
                       }
                       return Container(
                         child: InfoGaveta(
@@ -49,7 +49,7 @@ class GavetaNavegacao extends StatelessWidget {
                         ),
                       );
                     }),
-                Padding(
+                const Padding(
                   padding: EdgeInsets.all(20),
                   child: Divider(
                     color: Colors.white,
@@ -61,6 +61,13 @@ class GavetaNavegacao extends StatelessWidget {
                     titulo: "Resumo",
                     metodoQuandoItemClicado: () async {
                       c.irParaPainel(PainelActual.VENDAS);
+                    }),
+                ItemDaGaveta(
+                    cor: branca,
+                    icone: Icons.monetization_on,
+                    titulo: "Caixa",
+                    metodoQuandoItemClicado: () async {
+                      c.irParaPainel(PainelActual.SAIDA_CAIXA);
                     }),
                 ItemDaGaveta(
                     cor: branca,
@@ -120,13 +127,6 @@ class GavetaNavegacao extends StatelessWidget {
                     }),
                 ItemDaGaveta(
                     cor: branca,
-                    icone: Icons.monetization_on,
-                    titulo: "Caixa",
-                    metodoQuandoItemClicado: () async {
-                      c.irParaPainel(PainelActual.SAIDA_CAIXA);
-                    }),
-                ItemDaGaveta(
-                    cor: branca,
                     icone: Icons.money,
                     titulo: "Investimento",
                     metodoQuandoItemClicado: () async {
@@ -134,10 +134,17 @@ class GavetaNavegacao extends StatelessWidget {
                     }),
                 ItemDaGaveta(
                     cor: branca,
-                    icone: Icons.list,
+                    icone: Icons.wysiwyg_sharp,
                     titulo: "Inventário",
                     metodoQuandoItemClicado: () async {
                       c.irParaPainel(PainelActual.INVENTARIO);
+                    }),
+                ItemDaGaveta(
+                    cor: branca,
+                    icone: Icons.cancel_presentation_rounded,
+                    titulo: "Desperdícios",
+                    metodoQuandoItemClicado: () async {
+                      c.irParaPainel(PainelActual.DESPERDICIOS);
                     }),
                 ItemDaGaveta(
                     cor: branca,

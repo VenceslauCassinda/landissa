@@ -8,6 +8,7 @@ import 'package:yetu_gestor/vista/janelas/paineis/gerente/sub_paineis/entradas/l
 
 import '../../../../../../dominio/entidades/nivel_acesso.dart';
 import '../../../../../../recursos/constantes.dart';
+import '../../../../../../solucoes_uteis/responsividade.dart';
 import '../../../../../componentes/pesquisa.dart';
 import '../../../../../componentes/tab_bar.dart';
 import 'layouts/saidas.dart';
@@ -67,7 +68,7 @@ class PainelSaidas extends StatelessWidget {
               ),
               Spacer(),
               Container(
-                width: 250,
+                width: !Responsidade.isMobile(context) ? 250 : 130,
                 child: Visibility(
                   visible: _painelGerenteC.funcionarioActual.nivelAcesso ==
                       NivelAcesso.GERENTE,
@@ -87,7 +88,7 @@ class PainelSaidas extends StatelessWidget {
                 width: 20,
               ),
               Container(
-                width: 250,
+                width: !Responsidade.isMobile(context) ? 250 : 130,
                 child: Visibility(
                   visible: _painelGerenteC.funcionarioActual.nivelAcesso ==
                       NivelAcesso.GERENTE,

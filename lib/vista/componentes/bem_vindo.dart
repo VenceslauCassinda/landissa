@@ -52,7 +52,7 @@ class LayoutBemVindo extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 0, left: 50, right: 50),
                 child: Text(
-                    "Reduza o tempo gasto em atividades operacionais como preenchimento de planilhas, transcição de anotações em folhas e papéis para documentos online, compartilhamento de informações entre departamentos",
+                    "Reduza o tempo gasto em atividades operacionais como preenchimento de planilhas, transcição de anotações em folhas e papéis para documentos online.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -72,7 +72,7 @@ class LayoutBemVindo extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 20),
-                child: Text("\n\n\nVersão: 1.0.0",
+                child: Text("\n\n\nVersão: 1.0.1",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,

@@ -8,6 +8,7 @@ import 'package:yetu_gestor/vista/componentes/item_dinheiro_sobra.dart';
 import '../../../../../../dominio/entidades/nivel_acesso.dart';
 import '../../../../../../recursos/constantes.dart';
 import '../../../../../../solucoes_uteis/formato_dado.dart';
+import '../../../../../../solucoes_uteis/responsividade.dart';
 import '../../../../../componentes/pesquisa.dart';
 import '../../painel_funcionario_c.dart';
 import 'painel_c.dart';
@@ -70,7 +71,7 @@ class PainelDinheiroSobra extends StatelessWidget {
             children: [
               Obx(
                 () => Text(
-                  "DINHEIRO A MAIS (Total: ${formatar(_c.total.value)} KZ)",
+                  "DINHEIRO A MAIS (${formatar(_c.total.value)} KZ)",
                   style: TextStyle(color: primaryColor, fontSize: 20),
                 ),
               ),
@@ -79,7 +80,7 @@ class PainelDinheiroSobra extends StatelessWidget {
                 width: 20,
               ),
               Container(
-                width: 250,
+                width: !Responsidade.isMobile(context) ? 250 : 130,
                 child: Visibility(
                   visible: _funcionarioC.funcionarioActual.nivelAcesso ==
                       NivelAcesso.GERENTE,

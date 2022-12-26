@@ -6,6 +6,7 @@ import 'package:yetu_gestor/vista/componentes/item_investimento.dart';
 import '../../../../../../dominio/entidades/nivel_acesso.dart';
 import '../../../../../../dominio/entidades/painel_actual.dart';
 import '../../../../../../recursos/constantes.dart';
+import '../../../../../../solucoes_uteis/responsividade.dart';
 import '../../../../../componentes/tab_bar.dart';
 import '../../../../../componentes/pesquisa.dart';
 import '../../painel_gerente_c.dart';
@@ -56,13 +57,13 @@ class PainelInvestimento extends StatelessWidget {
             children: [
               Obx(() {
                 return Text(
-                  "INVESTIMENTO (Total: ${formatar(_c.totalInvestido.value)} KZ)",
+                  "INVESTIMENTO (${formatar(_c.totalInvestido.value)} KZ)",
                   style: const TextStyle(color: primaryColor, fontSize: 20),
                 );
               }),
               Spacer(),
               Container(
-                width: 250,
+                width: !Responsidade.isMobile(context) ? 250 : 130,
                 child: Visibility(
                   visible: gerenteC.funcionarioActual.nivelAcesso ==
                       NivelAcesso.GERENTE,

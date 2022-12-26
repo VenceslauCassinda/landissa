@@ -233,8 +233,8 @@ class ManipularVenda implements ManipularVendaI {
   @override
   Future<bool> actualizarVenda(Venda venda, bool fazerOuDesfazer) async {
     await _provedorVendaI.actualizarVenda(venda);
-    var saida =
-        await _manipularSaidaI.pegarSaidaDeProdutoDeId(venda.idProduto ?? -1);
+    var saida = await _manipularSaidaI.pegarSaidaDeProdutoDeIdEmotivo(
+        venda.idProduto ?? -1, Saida.MOTIVO_VENDA);
     if (saida == null) {
       await _manipularSaidaI.registarSaida(Saida(
           estado: Estado.ATIVADO,

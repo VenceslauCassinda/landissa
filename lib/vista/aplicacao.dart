@@ -15,18 +15,18 @@ class Aplicacao extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: Size(360, 690),
+      designSize: const Size(360, 690),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: () => GetMaterialApp(
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: [Locale('pt', 'BR')],
         theme: ThemeData(
-            primaryColor: Color.fromRGBO(86, 0, 78, 1),
-            accentColor: Color.fromRGBO(86, 0, 78, 1),
+            primaryColor: const Color.fromRGBO(86, 0, 78, 1),
+            accentColor: const Color.fromRGBO(86, 0, 78, 1),
             colorScheme: ThemeData()
                 .colorScheme
-                .copyWith(secondary: Color.fromRGBO(86, 0, 78, 1))),
+                .copyWith(secondary: const Color.fromRGBO(86, 0, 78, 1))),
         debugShowCheckedModeBanner: false,
         home: JanelaLogin(),
       ),

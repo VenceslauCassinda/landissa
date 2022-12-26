@@ -49,10 +49,10 @@ class PainelProdutos extends StatelessWidget {
               Obx(() {
                 return Text(
                   "PRODUTOS (${_c.lista.length})",
-                  style: TextStyle(color: primaryColor),
+                  style: const TextStyle(color: primaryColor),
                 );
               }),
-              Spacer(),
+              const Spacer(),
               Expanded(
                   child: ModeloTabBar(
                 listaItens: ["Todos", "Activos", "Desactivos", "Eliminados"],
@@ -73,7 +73,7 @@ class PainelProdutos extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Center(child: Text("Sem Dados!")),
+                  const Center(child: Text("Sem Dados!")),
                 ],
               );
             }
@@ -101,7 +101,7 @@ class PainelProdutos extends StatelessWidget {
                   _c.importarPrecos();
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               ModeloButao(
@@ -114,7 +114,7 @@ class PainelProdutos extends StatelessWidget {
                   _c.mostrarDialogoGerarRelatorioInvestimento(context);
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               ModeloButao(
@@ -127,7 +127,7 @@ class PainelProdutos extends StatelessWidget {
                   _c.mostrarDialogoAdicionarProduto(context);
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
             ],

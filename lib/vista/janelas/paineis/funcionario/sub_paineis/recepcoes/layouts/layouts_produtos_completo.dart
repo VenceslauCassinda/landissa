@@ -28,7 +28,7 @@ class LayoutProdutosCompleto extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         width: MediaQuery.of(context).size.width * .5,
-        height: 500,
+        height: MediaQuery.of(context).size.height * .5,
         child: Column(
           children: [
             Padding(
@@ -52,10 +52,14 @@ class LayoutProdutosCompleto extends StatelessWidget {
                         onTap: () {
                           aoClicarItem(produtos[indice]);
                         },
-                        child: ItemProduto(
-                          produto: produtos[indice],
-                          futurePegarStock: manipularProdutoI
-                              .pegarStockDoProdutoDeId(produtos[indice].id!),
+                        child: Container(
+                          height: 80,
+                          child: ItemProduto(
+                            tamanhoIcon: 30,
+                            produto: produtos[indice],
+                            futurePegarStock: manipularProdutoI
+                                .pegarStockDoProdutoDeId(produtos[indice].id!),
+                          ),
                         ),
                       );
                     }));

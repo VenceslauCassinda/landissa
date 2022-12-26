@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:yetu_gestor/fonte_dados/erros.dart';
 import 'package:yetu_gestor/fonte_dados/padrao_dao/base_dados.dart';
 import 'package:yetu_gestor/fonte_dados/serializadores/serializador_usuario.dart';
+import 'package:yetu_gestor/solucoes_uteis/console.dart';
 import '../../contratos/provedores/provedor_usuario_i.dart';
 import '../../dominio/entidades/usuario.dart';
 
@@ -47,6 +48,9 @@ class ProvedorUsuario implements ProvedorUsuarioI {
 
   @override
   Future<Usuario?> fazerLogin(String nomeUsuario, String palavraPasse) async {
+    mostrar(nomeUsuario);
+    nomeUsuario = nomeUsuario.toLowerCase();
+    mostrar(nomeUsuario);
     var dado = await _usuarioDao.existeUsuario(nomeUsuario, palavraPasse);
     if (dado == null) {
       throw ErroUsuarioNaoExiste("CREDENCIAIS INVALIDAS");

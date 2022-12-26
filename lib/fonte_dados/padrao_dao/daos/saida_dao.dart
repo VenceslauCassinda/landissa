@@ -100,6 +100,27 @@ class SaidaDao extends DatabaseAccessor<BancoDados> with _$SaidaDaoMixin {
     return saida;
   }
 
+  Future<Saida?> pegarSaidaDeProdutoDeIdEmotivo(int id, String motivo) async {
+    var res = await (select(tabelaSaida)
+          ..where((tbl) => tbl.idProduto.equals(id)))
+        .get();
+    Saida? saida;
+    for (var cada in res) {
+      if (comapararDatas(cada.data, DateTime.now()) == true &&
+          cada.idProduto == id&&cada.motivo == motivo) {
+        saida = Saida(
+            estado: cada.estado,
+            id: cada.id,
+            idProduto: cada.idProduto,
+            quantidade: cada.quantidade,
+            data: cada.data,
+            motivo: cada.motivo);
+        break;
+      }
+    }
+    return saida;
+  }
+
   Future<void> actualizar(Saida saida) async {
     await update(tabelaSaida).replace(TabelaSaidaCompanion.insert(
         estado: saida.estado!,

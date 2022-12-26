@@ -71,4 +71,9 @@ class ManipularSaida implements ManipularSaidaI {
   Future removerTudo() async {
     await _provedorSaidaI.removerTudo();
   }
+
+  @override
+  Future<Saida?> pegarSaidaDeProdutoDeIdEmotivo(int id, String motivo) async {
+    return await _provedorSaidaI.pegarSaidaDeProdutoDeIdEmotivo(id, motivo);
+  }
 }

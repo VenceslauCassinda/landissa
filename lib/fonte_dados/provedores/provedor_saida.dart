@@ -36,12 +36,17 @@ class ProvedorSaida implements ProvedorSaidaI {
   }
 
   @override
-  Future removerAntes(DateTime data) async{
+  Future removerAntes(DateTime data) async {
     await _dao.removerAntes(data);
   }
-  
+
   @override
-  Future removerTudo() async{
+  Future removerTudo() async {
     await _dao.removerTudo();
+  }
+
+  @override
+  Future<Saida?> pegarSaidaDeProdutoDeIdEmotivo(int id, String motivo) async {
+    return await _dao.pegarSaidaDeProdutoDeIdEmotivo(id, motivo);
   }
 }

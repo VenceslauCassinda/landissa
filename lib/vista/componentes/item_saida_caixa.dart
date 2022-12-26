@@ -1,5 +1,7 @@
+import 'package:componentes_visuais/componentes/formatos/formatos.dart';
 import 'package:componentes_visuais/componentes/icone_item.dart';
 import 'package:flutter/material.dart';
+import 'package:yetu_gestor/dominio/entidades/caixa.dart';
 import 'package:yetu_gestor/solucoes_uteis/formato_dado.dart';
 import '../../dominio/entidades/saida_caixa.dart';
 import '../../recursos/constantes.dart';
@@ -31,9 +33,9 @@ class ItemSaidaCaixa extends StatelessWidget {
               children: [
                 Text("Valor: ${formatar(saidaCaixa.valor ?? 0)} KZ"
                     .replaceAll("-", "")),
-                Text("Motivo: ${saidaCaixa.motivo ?? "Nenhum"}"),
-                Text(
-                    "Data: ${saidaCaixa.data.toString().replaceAll(" ", " às ").replaceAll(".000", "")}"),
+                Text("Observação: ${saidaCaixa.motivo ?? "Nenhum"}"
+                    .replaceAll(Caixa.MOTIVO_SALDO, "")),
+                Text("Data: ${formatarData(saidaCaixa.data!)}"),
                 Text(
                     "Tipo de Operação: ${formatar(saidaCaixa.valor ?? 0).toString().contains("-") ? "Saída de Caixa" : "Entrada de Caixa"}"),
                 Text(

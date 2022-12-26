@@ -16,6 +16,13 @@ class ErroUsuarioJaExiste extends Erro {
       : super(sms, naoMostrarErro: naoMostrarErro);
 }
 
+class ErroLicencaExpirada extends Erro {
+  String sms;
+  bool? naoMostrarErro;
+  ErroLicencaExpirada(this.sms, {this.naoMostrarErro})
+      : super(sms, naoMostrarErro: naoMostrarErro);
+}
+
 class ErroFuncionarioJaExiste extends Erro {
   String sms;
   bool? naoMostrarErro;
@@ -85,7 +92,6 @@ class ErroPagamentoInvalido extends Erro {
   ErroPagamentoInvalido(this.sms, {this.naoMostrarErro})
       : super(sms, naoMostrarErro: naoMostrarErro);
 }
-
 
 class ErroFormaPagamentoExistente extends Erro {
   String sms;

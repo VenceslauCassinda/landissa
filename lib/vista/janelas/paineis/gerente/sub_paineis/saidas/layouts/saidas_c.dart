@@ -153,6 +153,7 @@ class SaidasC extends GetxController {
           "O intervalo entre as data seleccionadas é invalido!");
       return;
     }
+    mostrarCarregandoDialogoDeInformacao("Carregando...");
     var maniProduto = ManipularProduto(
         ProvedorProduto(), _manipularStockI, ManipularPreco(ProvedorPreco()));
     List<List<String>> listaItens = [];

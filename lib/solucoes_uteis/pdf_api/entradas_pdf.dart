@@ -8,6 +8,7 @@ import '../../dominio/entidades/customer.dart';
 import '../../dominio/entidades/invoice.dart';
 import '../../dominio/entidades/supplier.dart';
 import 'pdf_api.dart';
+import 'precos_pdf.dart';
 
 class EntradasPdf {
   static Future<File> generate(Invoice invoice,
@@ -147,19 +148,7 @@ class EntradasPdf {
   //   );
   // }
 
-  static Widget buildFooter(Invoice invoice) => Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Divider(),
-          SizedBox(height: 2 * PdfPageFormat.mm),
-          Text(
-              "Processado por: YETUGESTOR ERP, DA: OKU SANGA (SU) - SOLUÇÕES TECNOLÓGICAS",
-              style: TextStyle(fontSize: 5)),
-          Text("Desenvolvedor: VENCESLAU EVANDRO CASSINDA MOREIRA",
-              style: TextStyle(fontSize: 5)),
-          Divider(),
-        ],
-      );
+  static Widget buildFooter(Invoice invoice) => buildFooterGeral(invoice);
 
   static buildSimpleText({
     required String title,

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:componentes_visuais/componentes/layout_confirmacao_accao.dart';
 import 'package:componentes_visuais/dialogo/dialogos.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,6 +15,7 @@ import '../dominio/casos_uso/manipular_definicoes.dart';
 import '../dominio/entidades/usuario.dart';
 import '../fonte_dados/padrao_dao/base_dados.dart';
 import '../fonte_dados/provedores/provedor_definicoes.dart';
+import '../recursos/constantes.dart';
 import 'janelas/cadastro/janela_cadastro.dart';
 import 'janelas/cadastro/janela_cadastro_c.dart';
 import 'janelas/login/janela_login.dart';
@@ -81,14 +83,34 @@ class AplicacaoC extends GetxController {
   }
 
   static void irParaJanelaCadastro(BuildContext context) async {
+    ManipularDefinicoes def = Get.find();
     try {
-      ManipularDefinicoes def = Get.find();
       await def.autenticaSistema();
       voltar();
     } catch (e) {
       voltar();
       if (e is SocketException) {
         mostrarDialogoDeInformacao("Sem Ligação à Internet!");
+        return;
+      }
+      if (e is ErroLicencaExpirada) {
+        mostrarDialogoDeLayou(
+            LayoutConfirmacaoAccao(
+                corButaoSim: primaryColor,
+                pergunta: "${e.sms}\n\nValidar via Internet?",
+                accaoAoConfirmar: () async {
+                  mostrarCarregandoDialogoDeInformacao("Validando...");
+                  try {
+                    await def.validarLicencaDaNet(
+                        await def.pegarDefinicoesActuais(), DateTime.now());
+                    voltar();
+                  } on Erro catch (e) {
+                    voltar();
+                    mostrarDialogoDeInformacao(e.sms);
+                  }
+                },
+                accaoAoCancelar: () {}),
+            layoutCru: true);
         return;
       }
       mostrarDialogoDeInformacao((e as Erro).sms);

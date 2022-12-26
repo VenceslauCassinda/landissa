@@ -1,6 +1,7 @@
 import 'package:yetu_gestor/contratos/casos_uso/manipular_produto_i.dart';
 import 'package:yetu_gestor/dominio/entidades/produto.dart';
 import 'package:yetu_gestor/dominio/entidades/funcionario.dart';
+import 'package:yetu_gestor/solucoes_uteis/console.dart';
 import 'package:yetu_gestor/solucoes_uteis/utils.dart';
 import '../../contratos/casos_uso/manipular_entrada_i.dart';
 import '../../contratos/casos_uso/manipular_receccao_i.dart';
